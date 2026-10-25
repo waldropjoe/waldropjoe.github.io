@@ -8,7 +8,9 @@ Standard library only — nothing to install.
 What it collects
   • CURATED MODE (recommended): set SPOTIFY_PLAYLIST_ID and only the podcast episodes in
     that playlist are shown. Add an episode to the playlist to publish it; remove it to
-    unpublish it. In this mode saved episodes are ignored.
+    unpublish it. In this mode saved episodes and saved audiobooks are ignored — the
+    playlist is the whole Spotify feed. (Audiobooks can't go in playlists, so add the
+    ones you want shown to data.js.)
   • Otherwise: saved podcast episodes ("Your Episodes") that you've started or finished.
       finished          -> status 'done'
       partway through   -> status 'now'
@@ -207,9 +209,8 @@ def main():
         except urllib.error.HTTPError as e:
             print(f"warning: playlist unavailable ({e.code}). If it's private, make it public "
                   "or rerun spotify_login.py (it now asks for playlist access).", file=sys.stderr)
-    sources = [("audiobooks", "/me/audiobooks", from_audiobooks)]
-    if not pid:
-        sources.insert(0, ("episodes", "/me/episodes", from_episodes))
+    # without a playlist: saved episodes you've played, plus saved audiobooks
+    sources = [] if pid else [("episodes", "/me/episodes", from_episodes), ("audiobooks", "/me/audiobooks", from_audiobooks)]
     for label, path, convert in sources:
         try:
             items = convert(paged(path, token), today)
@@ -220,9 +221,9 @@ def main():
             print(f"warning: {label} unavailable ({e.code}); keeping previous entries", file=sys.stderr)
 
     if curated is not None:
-        # the playlist is the source of truth for podcasts: drop synced episodes no longer in it
+        # the playlist is the whole Spotify feed: drop any synced item that isn't in it
         keep = {e["id"] for e in curated}
-        existing = [e for e in existing if not (e.get("type") == "podcast" and e.get("source") == "spotify" and e.get("id") not in keep)]
+        existing = [e for e in existing if not (e.get("source") == "spotify" and e.get("id") not in keep)]
     merged = merge(existing, fresh)
     text = json.dumps(merged, indent=2, ensure_ascii=False) + "\n"
     with open(OUT, "w", encoding="utf-8") as f:
