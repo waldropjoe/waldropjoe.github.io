@@ -10,9 +10,6 @@
 export const person = {
   name: 'Joe Waldrop',
   initials: 'JW',
-  eyebrow: 'Technology · Data · Product',
-  headline: ['Building systems.', 'Connecting ideas.', 'Creating what’s next.'],
-  intro: 'I work at the intersection of technology, analytics, and product execution — turning complex problems into practical solutions.',
 };
 
 export const links = {
@@ -131,6 +128,29 @@ export const experience = [
     summary: '[One or two sentences on what you were responsible for.]',
     highlights: ['[Selected accomplishment you can support.]'],
   },
+];
+
+// The Input Log: books and podcasts.
+//
+// Podcasts and audiobooks you save in Spotify arrive automatically in listening.json
+// (a GitHub Action updates it daily — see README). This list is for everything else:
+//   • books you read (or anything not on Spotify)
+//   • notes on Spotify items: add an entry with the same Spotify link and it's merged
+//     with the synced one — e.g. to add a takeaway, or to set status: 'now'
+//   • hiding a synced item: { link: 'https://open.spotify.com/episode/…', hide: true }
+//
+// Fields
+//   type:     'book' | 'audiobook' | 'podcast'
+//   status:   'now' for what you're on right now, otherwise 'done'
+//   date:     'YYYY-MM'
+//   link:     a Spotify link shows a play button; any other link shows "Details ↗"
+//   cover:    optional image URL ('' gives a generated cover tile)
+//   takeaway: one line on what stuck with you
+export const listening = [
+  { type: 'book', status: 'now', title: '[Book you are reading now]', by: '[Author]', date: '2026-10', takeaway: '[What has stuck with you so far.]', link: '', cover: '' },
+  { type: 'book', status: 'done', title: '[A book you finished]', by: '[Author]', date: '2026-09', takeaway: '[One-line takeaway.]', link: '', cover: '' },
+  // Example note on a synced podcast episode:
+  // { link: 'https://open.spotify.com/episode/XXXXXXXX', takeaway: 'The one thing that stuck.' },
 ];
 
 export const contact = {

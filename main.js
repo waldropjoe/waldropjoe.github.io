@@ -1,5 +1,5 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=5';
-import { person, links, about, projects, skills, experience, contact } from './data.js?v=5';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=11';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=11';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -20,7 +20,8 @@ const PAGES = [
   { id: 'work', label: 'Work', marker: '03', name: 'The Buildings', landmark: 'data-tower' },
   { id: 'skills', label: 'Skills', marker: '04', name: 'The Circuit Board', landmark: 'stack' },
   { id: 'experience', label: 'Experience', marker: '05', name: 'The Control Center', landmark: 'control' },
-  { id: 'contact', label: 'Contact', marker: '06', name: 'The Launchpad', landmark: 'core' },
+  { id: 'listening', label: 'Listening', marker: '06', name: 'The Listening Post', landmark: 'listening' },
+  { id: 'contact', label: 'Contact', marker: '07', name: 'The Launchpad', landmark: 'core' },
 ];
 
 const marker = (pg) => `<p class="marker mono"><span class="marker-n">${pg.marker}</span><span class="marker-line" aria-hidden="true"></span>${pg.name}</p>`;
@@ -93,6 +94,32 @@ function pageHTML(pg) {
         </ol>
         <p class="mono resume">${links.resume ? link(links.resume, 'View the full résumé ↗') : '<span class="ph">[add your résumé PDF to show a download link]</span>'}</p>`;
 
+    case 'listening': {
+      const items = allListening();
+      const now = items.filter((x) => x.status === 'now');
+      const done = items.filter((x) => x.status !== 'now');
+      const year = new Date().getFullYear();
+      const thisYear = items.filter((x) => String(x.date).startsWith(String(year)));
+      const count = (t) => thisYear.filter((x) => (t === 'book' ? x.type !== 'podcast' : x.type === 'podcast')).length;
+      return `
+        ${marker(pg)}
+        <h1 id="pageTitle" tabindex="-1">Input log.</h1>
+        <p class="body">What I'm reading and listening to — the inputs behind the work. Newest first, with the one thing that stuck.</p>
+        <p class="mono log-stats"><span>${count('book')} books</span><span>${count('podcast')} podcasts</span><span>in ${year}</span></p>
+        ${now.length ? `
+        <section class="log-now" aria-label="On right now">
+          <p class="mono on-air"><span class="on-dot" aria-hidden="true"></span>On right now</p>
+          ${now.map((x) => entryHTML(x, true)).join('')}
+        </section>` : ''}
+        <div class="log-filters" role="group" aria-label="Filter the log">
+          <button type="button" class="chip-btn" data-filter="all" aria-pressed="true">All</button>
+          <button type="button" class="chip-btn" data-filter="book" aria-pressed="false">Books</button>
+          <button type="button" class="chip-btn" data-filter="podcast" aria-pressed="false">Podcasts</button>
+        </div>
+        ${items.length ? '' : '<p class="body">Nothing logged yet.</p>'}
+        <ol class="log">${done.map((x) => `<li data-kind="${x.type === 'podcast' ? 'podcast' : 'book'}">${entryHTML(x, false)}</li>`).join('')}</ol>`;
+    }
+
     case 'contact': {
       const rows = [
         ['Email', links.email ? `mailto:${links.email}` : '', links.email || '[add your email]'],
@@ -112,6 +139,74 @@ function pageHTML(pg) {
   return '';
 }
 
+// ---------- the Input Log ----------
+// Spotify items synced by the daily GitHub Action (listening.json), merged with data.js
+let liveListening = [];
+function spotifyKey(link) {
+  const m = /open\.spotify\.com\/(?:intl-[a-z-]+\/)?(episode|show|audiobook|album|track|playlist)\/([A-Za-z0-9]+)/.exec(link || '');
+  return m ? `spotify:${m[1]}:${m[2]}` : null;
+}
+function allListening() {
+  const notes = new Map();
+  const manual = [];
+  for (const x of listening) {
+    const key = spotifyKey(x.link);
+    if (key) notes.set(key, x); else manual.push(x);
+  }
+  // a data.js entry with the same Spotify link adds to (or hides) the synced item
+  const filled = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== '' && v !== undefined && v !== null));
+  const synced = liveListening.map((x) => {
+    const n = notes.get(x.id);
+    if (n) notes.delete(x.id);
+    return n ? { ...x, ...filled(n) } : x;
+  });
+  const leftover = [...notes.values()].filter((x) => x.title);   // notes for items not synced yet
+  return [...synced, ...leftover, ...manual]
+    .filter((x) => !x.hide && x.title)
+    .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+}
+
+const TYPE_LABEL = { book: 'Book', audiobook: 'Audiobook', podcast: 'Podcast' };
+const TYPE_COLOR = { book: 'yellow', audiobook: 'orange', podcast: 'magenta' };
+function spotifyEmbed(url) {
+  const m = /^https:\/\/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(episode|show|audiobook|album|track|playlist)\/([A-Za-z0-9]+)/.exec(url || '');
+  return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : '';
+}
+function monthLabel(d) {
+  const m = /^(\d{4})-(\d{2})/.exec(d || '');
+  return m ? new Date(+m[1], +m[2] - 1, 1).toLocaleString('en-US', { month: 'short', year: 'numeric' }) : esc(d || '');
+}
+// a generated cover tile when there's no cover image: type colour, initials and an icon
+function coverHTML(x) {
+  // the generated tile sits underneath; a cover image covers it, and removes itself if it fails to load
+  const img = x.cover ? `<img class="cover-img" src="${esc(x.cover)}" alt="" loading="lazy" onerror="this.remove()">` : '';
+  return `<span class="cover-wrap">${tileHTML(x)}${img}</span>`;
+}
+function tileHTML(x) {
+  const initials = String(x.title).replace(/\[|\]/g, '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '··';
+  const icon = x.type === 'podcast'
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+  return `<span class="cover gen" style="--c:${COLORS[TYPE_COLOR[x.type] || 'cyan']}" aria-hidden="true"><b>${esc(initials)}</b>${icon}</span>`;
+}
+function entryHTML(x, big) {
+  const embed = spotifyEmbed(x.link);
+  const action = embed
+    ? `<button type="button" class="mono play" data-embed="${esc(embed)}">▶ Play on Spotify</button>`
+    : x.link ? `<a class="mono" href="${esc(x.link)}" target="_blank" rel="noopener">Details ↗</a>` : '';
+  return `
+    <article class="entry${big ? ' big' : ''}" style="--c:${COLORS[TYPE_COLOR[x.type] || 'cyan']}">
+      ${coverHTML(x)}
+      <div class="entry-body">
+        <p class="mono entry-meta"><span class="type">${TYPE_LABEL[x.type] || 'Item'}</span>${monthLabel(x.date)}${x.source === 'spotify' ? '<span class="via">via Spotify</span>' : ''}</p>
+        <h2>${ph(x.title)}</h2>
+        <p class="entry-by">${ph(x.by)}</p>
+        ${x.takeaway ? `<p class="takeaway">${ph(x.takeaway)}</p>` : ''}
+        ${action ? `<p class="entry-act">${action}</p>` : ''}
+      </div>
+    </article>`;
+}
+
 // next / previous building, so a visitor can tour the city page by page
 function pagerHTML(pg) {
   const i = PAGES.indexOf(pg);
@@ -129,19 +224,16 @@ function pagerHTML(pg) {
 function renderHome() {
   $('#main').innerHTML = `
   <section class="hero" id="home" aria-labelledby="hero-title">
-    <div class="col">
-      <p class="eyebrow mono">${esc(person.eyebrow)}</p>
-      <h1 id="hero-title">${person.headline.map((l) => `<span>${esc(l)}</span>`).join('')}</h1>
-      <p class="intro">${esc(person.intro)}</p>
-      <div class="ctas">
-        <a class="btn primary" href="#/work">Explore my work <span aria-hidden="true">→</span></a>
-        <a class="btn ghost" href="#/about">About me</a>
-      </div>
-      <p class="hint mono">click a building to enter · or open the <button type="button" class="linklike" data-open-dir>directory</button></p>
-    </div>
-    <div class="hero-foot mono" aria-hidden="true">
-      <span class="status"><span class="status-dot"></span>System online</span>
-      <span>${LANDMARKS.length} buildings · ${PAGES.length} districts</span>
+    <h1 id="hero-title" class="sr-only">${esc(person.name)} — portfolio. Choose a building to enter.</h1>
+    <div class="hero-foot mono">
+      <span class="status" aria-hidden="true"><span class="status-dot"></span>System online</span>
+      <span class="hint">${matchMedia('(hover: none)').matches
+        ? 'Tap to drive · drag to pan · or open the <button type="button" class="linklike" data-open-dir>directory</button>'
+        : 'Click to drive · drag to pan · right-drag to orbit · ⏎ to enter · or open the <button type="button" class="linklike" data-open-dir>directory</button>'}</span>
+      <span class="cam-ctl">
+        <button type="button" class="cam-btn" id="resetView">Reset view</button>
+        <button type="button" class="cam-btn help" id="helpOpen" aria-haspopup="dialog" aria-label="Controls">?</button>
+      </span>
     </div>
   </section>`;
 
@@ -164,11 +256,37 @@ $('#dirClose').addEventListener('click', closeDir);
 dir.addEventListener('click', (e) => { if (e.target === dir) closeDir(); });
 $$('[data-dir]').forEach((a) => a.addEventListener('click', closeDir));
 
+// ---------- "⏎ Enter" prompt when the car is parked at a building ----------
+const promptEl = $('#prompt');
+let promptLm = null;
+function showPrompt(lm) {
+  promptLm = lm;
+  if (!lm || current) { promptEl.hidden = true; return; }
+  $('[data-p-name]', promptEl).textContent = lm.name;
+  $('[data-p-sub]', promptEl).textContent = lm.sub;
+  promptEl.hidden = false;
+}
+promptEl.addEventListener('click', () => { if (promptLm) location.hash = promptLm.target; });
+
+// ---------- controls card ----------
+const controls = $('#controls');
+const openControls = () => { if (typeof controls.showModal === 'function') controls.showModal(); else controls.setAttribute('open', ''); };
+const closeControls = () => (typeof controls.close === 'function' ? controls.close() : controls.removeAttribute('open'));
+$('#helpOpen').addEventListener('click', openControls);
+$('#controlsClose').addEventListener('click', closeControls);
+controls.addEventListener('click', (e) => { if (e.target === controls) closeControls(); });
+$('#controlsBody').innerHTML = (matchMedia('(hover: none)').matches
+  ? [['Tap', 'drive the car there. The camera follows it until it arrives'], ['Drag', 'pan the camera'], ['Tap the prompt', 'go into the building the car is parked at']]
+  : [['Left click', 'drive the car there. The camera follows it until it arrives'], ['Left drag', 'pan the camera'], ['Right drag', 'orbit the island'], ['Shift + drag', 'orbit the island too'], ['W A S D / arrows', 'drive yourself. The camera stays where you put it'], ['Space', 'hop'], ['⏎ Enter', 'go into a building while parked outside it']]
+).map(([k, v]) => `<div><dt class="mono">${k}</dt><dd>${v}</dd></div>`).join('');
+
 // ---------- the city ----------
 const city = createCity($('#city'), {
   labelLayer: $('#labels'),
   tooltip: $('#tooltip'),
   onEnter: (lm) => { location.hash = lm.target; },
+  onNear: (lm) => showPrompt(lm),
+  canDrive: () => !current && !dir.open && !controls.open,
   reducedMotion: () => reduced.matches,
 });
 if (!city) document.documentElement.classList.add('no-canvas');
@@ -176,15 +294,15 @@ if (!city) document.documentElement.classList.add('no-canvas');
 // camera: the whole chip at home, or flown down to one building
 function homeView() {
   return isPhone()
-    ? { yaw: 45, pitch: 33, zoom: 1.0, tx: 0, ty: 0, tz: 4, ox: 0, oy: -0.24, labels: 1, glow: 0, lmx: 0 }
-    : { yaw: 45, pitch: 33, zoom: 0.94, tx: 0, ty: 0, tz: 4, ox: 0.23, oy: 0.04, labels: 1, glow: 0, lmx: 0 };
+    ? { yaw: 45, pitch: 50, zoom: 1.28, tx: 0, ty: 0, tz: 4, ox: 0, oy: -0.01, labels: 1, glow: 0, lmx: 0 }
+    : { yaw: 45, pitch: 33, zoom: 1.12, tx: 0, ty: 0, tz: 4, ox: 0, oy: 0.03, labels: 1, glow: 0, lmx: 0 };
 }
 // each building gets its own angle, so every dive feels like arriving somewhere different
-const ANGLES = { hq: 20, 'data-tower': 15, relay: 70, lab: 80, stack: 30, control: 60, core: 45 };
+const ANGLES = { listening: 30, hq: 45, 'data-tower': 15, relay: 70, lab: 80, stack: 30, control: 60, core: 45 };
 function focusView(lm) {
   const core = !!lm.core;
-  const h = core ? 0 : lm.roof === 'spire' ? lm.h * 1.14 : lm.h;
-  const zoom = core ? 3.2 : Math.max(2.4, Math.min(4.2, 95 / (h + 12)));
+  const h = core ? 0 : lm.roof === 'mast' ? lm.h + 16 : lm.roof === 'spire' ? lm.h * 1.14 : lm.roof === 'sign' ? lm.h + 8 : lm.h;
+  const zoom = core ? 3.2 : lm.roof === 'sign' ? 1.9 : Math.max(2.4, Math.min(4.2, 95 / (h + 12)));
   const yaw = ANGLES[lm.id] ?? 45;
   return isPhone()
     ? { yaw, pitch: core ? 46 : 24, zoom: zoom * 0.8, tx: lm.x, ty: lm.y, tz: h * 0.5, ox: 0, oy: -0.33, labels: 0, glow: core ? 1 : 0, lmx: 0 }
@@ -217,18 +335,19 @@ function route() {
       sheet.classList.remove('open');
       document.body.classList.remove('page-open');
       openTimer = setTimeout(() => { sheet.hidden = true; }, reduced.matches ? 0 : 450);
-      document.title = 'Joe Waldrop — Building systems, connecting ideas';
+      document.title = 'Joe Waldrop — Chip City';
       if (returnFocus && document.contains(returnFocus)) returnFocus.focus({ preventScroll: true });
     }
     city && city.setFocus(null);
-    city && city.setView(homeView(), false, 3.2);
+    city && city.restoreView();
+    setTimeout(() => showPrompt(city ? city.near : null), reduced.matches ? 0 : 600);
     return;
   }
 
   // a project inside Work flies to that project's own building
   const project = r.sub ? projects.find((p) => p.id === r.sub) : null;
   const lm = lmById(project ? project.landmark : r.pg.landmark);
-  if (!current) returnFocus = document.activeElement;
+  if (!current) { returnFocus = document.activeElement; city && city.saveView(); }
 
   const switching = current && current !== r.pg.id;
   const same = current === r.pg.id;
@@ -236,6 +355,8 @@ function route() {
   document.body.classList.add('page-open');
   document.title = `${r.pg.label} — Joe Waldrop`;
   city && city.setFocus(lm.id);
+  city && city.parkAt(lm.id);
+  promptEl.hidden = true;
   city && city.setView(focusView(lm), false, 2.6);
 
   const show = () => {
@@ -244,7 +365,7 @@ function route() {
       wirePage();
       body.scrollTop = 0;
     }
-    $('#sheetWhere').textContent = `${r.pg.marker} / 06 · ${lm.name}`;
+    $('#sheetWhere').textContent = `${r.pg.marker} / ${String(PAGES.length + 1).padStart(2, '0')} · ${lm.name}`;
     sheet.hidden = false;
     void sheet.offsetWidth;
     sheet.classList.add('open');
@@ -270,6 +391,22 @@ function route() {
 }
 
 function wirePage() {
+  // Input Log filters
+  $$('[data-filter]', body).forEach((b) => b.addEventListener('click', () => {
+    const f = b.dataset.filter;
+    $$('[data-filter]', body).forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    $$('.log > li', body).forEach((li) => { li.hidden = f !== 'all' && li.dataset.kind !== f; });
+  }));
+  // Spotify players load only when asked for (no third-party requests until then)
+  $$('[data-embed]', body).forEach((b) => b.addEventListener('click', () => {
+    const f = document.createElement('iframe');
+    f.src = b.dataset.embed;
+    f.title = 'Spotify player';
+    f.loading = 'lazy';
+    f.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+    f.className = 'spotify';
+    b.replaceWith(f);
+  }));
   $$('.node', body).forEach((btn) => {
     const showSkill = () => {
       const [gi, ii] = btn.dataset.skill.split('-').map(Number);
@@ -290,12 +427,34 @@ window.addEventListener('resize', () => {
   if (r) {
     const project = r.sub ? projects.find((p) => p.id === r.sub) : null;
     city.setView(focusView(lmById(project ? project.landmark : r.pg.landmark)), true);
-  } else city.setView(homeView(), true);
+  }
+  city.setHome(homeView());
 });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && current && !dir.open) location.hash = '#/';
 });
 
+// load the synced Spotify log; if the Input Log is open, refresh it
+fetch('listening.json', { cache: 'no-cache' })
+  .then((r) => (r.ok ? r.json() : []))
+  .then((data) => {
+    if (!Array.isArray(data) || !data.length) return;
+    liveListening = data;
+    if (current === 'listening') {
+      const pg = PAGES.find((p) => p.id === 'listening');
+      body.innerHTML = `<div class="page page-listening">${pageHTML(pg)}${pagerHTML(pg)}</div>`;
+      wirePage();
+    }
+  })
+  .catch(() => { /* opened from a file, or offline: manual entries only */ });
+
 // first load: start on the chip; deep links fly straight in
-if (city) city.setView(homeView(), true);
+if (city) { city.setHome(homeView()); city.setView(homeView(), true); }
+$('#resetView').addEventListener('click', () => city && city.resetView());
+// show the controls once, on a first visit to the city
+try {
+  if (!location.hash.startsWith('#/') || location.hash === '#/') {
+    if (!localStorage.getItem('jw-controls-seen')) { openControls(); localStorage.setItem('jw-controls-seen', '1'); }
+  }
+} catch (_) { /* storage unavailable: skip */ }
 route();

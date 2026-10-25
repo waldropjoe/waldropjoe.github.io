@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Joe Waldrop — Building systems, connecting ideas</title>
-  <meta name="description" content="Joe Waldrop works at the intersection of technology, analytics and product execution — turning complex problems into practical solutions.">
+  <title>Joe Waldrop — Chip City</title>
+  <meta name="description" content="Joe Waldrop — project manager and analyst. Explore the portfolio as a neon city built on a computer chip.">
   <meta name="theme-color" content="#070611">
   <meta property="og:title" content="Joe Waldrop — Chip City">
   <meta property="og:description" content="A portfolio built as a city on a computer chip: technology, data and product.">
@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=11">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -24,6 +24,11 @@
   <span class="tt-key">⏎ Enter</span> <strong data-tt-name></strong>
   <span class="tt-sub" data-tt-sub></span>
 </div>
+
+<button type="button" class="prompt" id="prompt" hidden>
+  <span class="tt-key">⏎ Enter</span> <strong data-p-name></strong>
+  <span class="tt-sub" data-p-sub></span>
+</button>
 
 <header class="nav" id="nav">
   <a class="brand" href="#/" aria-label="Joe Waldrop, back to the city">
@@ -52,7 +57,16 @@
   </div>
 </dialog>
 
+<dialog class="directory controls" id="controls" aria-labelledby="controlsTitle">
+  <div class="dir-inner">
+    <p class="mono dir-title" id="controlsTitle">Controls</p>
+    <p class="controls-lede">The camera only moves when you move it — except that sending the car somewhere makes the camera follow it until it arrives. Panning or orbiting takes over again.</p>
+    <dl class="controls-list" id="controlsBody"></dl>
+    <button type="button" class="btn primary" id="controlsClose">Got it</button>
+  </div>
+</dialog>
+
 <noscript><p class="noscript">This portfolio draws its city with JavaScript. Please enable it to explore.</p></noscript>
-<script type="module" src="main.js?v=5"></script>
+<script type="module" src="main.js?v=11"></script>
 </body>
 </html>
