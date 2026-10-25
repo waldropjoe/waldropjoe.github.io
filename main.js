@@ -1,209 +1,301 @@
-(() => {
-  'use strict';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=5';
+import { person, links, about, projects, skills, experience, contact } from './data.js?v=5';
 
-  // The page scrolls through five sections; the wheel is a dial for that scroll.
-  // Scrolling turns the wheel, and turning the wheel scrolls the page.
-  const STEP = 72;     // degrees per section
-  const QUEST = [
-    'the run starts. the unicorn is way ahead.',
-    'closing in.',
-    'halfway there.',
-    'almost.',
-    'so close. never quite there.'
-  ];
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+const isPhone = () => window.innerWidth < 900;
 
-  const $ = (s, r = document) => r.querySelector(s);
-  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+// ---------- helpers ----------
+const esc = (t) => String(t).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+// anything in [brackets] is a placeholder: show it dimmed
+const ph = (t) => esc(t).replace(/\[[^\]]*\]/g, (m) => `<span class="ph">${m}</span>`);
+const link = (href, label) => (href ? `<a href="${esc(href)}"${/^https?:/.test(href) ? ' target="_blank" rel="noopener"' : ''}>${esc(label)}</a>` : '');
+const lmById = (id) => LANDMARKS.find((l) => l.id === id);
 
-  const content = $('.content');
-  const blocks = $$('.block');
-  const wheel = $('#wheel');
-  const rotor = $('#rotor');
-  const labels = $$('.label', rotor);
-  const segs = $$('.seg', rotor);
-  const runner = $('#runner');
-  const unicorn = $('#unicorn');
-  const hubN = $('#hubN');
-  const quest = $('#quest');
+// ---------- pages ----------
+// Each page lives at its own address (#/about, #/work …) and belongs to a building.
+const PAGES = [
+  { id: 'about', label: 'About', marker: '02', name: 'The Infrastructure', landmark: 'hq' },
+  { id: 'work', label: 'Work', marker: '03', name: 'The Buildings', landmark: 'data-tower' },
+  { id: 'skills', label: 'Skills', marker: '04', name: 'The Circuit Board', landmark: 'stack' },
+  { id: 'experience', label: 'Experience', marker: '05', name: 'The Control Center', landmark: 'control' },
+  { id: 'contact', label: 'Contact', marker: '06', name: 'The Launchpad', landmark: 'core' },
+];
 
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+const marker = (pg) => `<p class="marker mono"><span class="marker-n">${pg.marker}</span><span class="marker-line" aria-hidden="true"></span>${pg.name}</p>`;
 
-  let anchors = [];        // scroll positions where each section is "on the dial"
-  let lap = 0;             // completed runs; keeps the wheel turning forward when the run restarts
-  let override = null;     // wheel position during the restart animation
-  let lastActive = -1;
-  let idleTimer = 0;
-  let frame = 0;
-  let drag = null;
-  let suppressClick = false;
+function pageHTML(pg) {
+  switch (pg.id) {
+    case 'about':
+      return `
+        ${marker(pg)}
+        <h1 id="pageTitle" tabindex="-1">${esc(about.title)}</h1>
+        ${about.body.map((p) => `<p class="body">${ph(p)}</p>`).join('')}
+        <ol class="principles">
+          ${about.principles.map((p) => `<li><span class="mono code">${esc(p.code)}</span><span>${ph(p.text)}</span></li>`).join('')}
+        </ol>`;
 
-  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-  const maxScroll = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    case 'work':
+      return `
+        ${marker(pg)}
+        <h1 id="pageTitle" tabindex="-1">Selected work. Each one is a building in the city.</h1>
+        <div class="projects">
+          ${projects.map((p, i) => {
+            const lm = lmById(p.landmark);
+            const plinks = [link(p.links.caseStudy, 'Case study ↗'), link(p.links.demo, 'Live demo ↗'), link(p.links.source, 'Source ↗')].filter(Boolean).join('');
+            return `
+            <article class="project${i === 0 ? ' featured' : ''}" id="project-${p.id}" style="--accent:${COLORS[lm ? lm.color : 'cyan']}">
+              <header class="p-head">
+                <p class="mono p-meta"><span class="p-dot" aria-hidden="true"></span>${esc(lm ? lm.name : 'Building')} · ${ph(p.category)}</p>
+                <h2>${ph(p.name)}</h2>
+                <p class="mono p-sub">${ph(p.role)} · ${ph(p.year)}</p>
+              </header>
+              <dl class="p-grid">
+                <div><dt class="mono">Problem</dt><dd>${ph(p.problem)}</dd></div>
+                <div><dt class="mono">Approach</dt><dd>${ph(p.approach)}</dd></div>
+                <div><dt class="mono">Tools</dt><dd class="chips">${p.tools.map((t) => `<span class="chip">${ph(t)}</span>`).join('')}</dd></div>
+                <div><dt class="mono">Outcome</dt><dd>${ph(p.outcome)}</dd></div>
+              </dl>
+              ${plinks ? `<p class="p-links mono">${plinks}</p>` : ''}
+            </article>`;
+          }).join('')}
+        </div>`;
 
-  function measure() {
-    const offset = window.innerHeight * 0.38;
-    const max = maxScroll();
-    anchors = blocks.map((b, i) => {
-      if (i === 0) return 0;
-      return Math.min(b.getBoundingClientRect().top + window.scrollY - offset, max);
-    });
-    // keep anchors strictly increasing, even when the last sections are short
-    for (let i = anchors.length - 1; i > 0; i--) {
-      if (i === anchors.length - 1) anchors[i] = Math.min(anchors[i], max);
-      if (anchors[i - 1] >= anchors[i]) anchors[i - 1] = anchors[i] - 1;
+    case 'skills':
+      return `
+        ${marker(pg)}
+        <h1 id="pageTitle" tabindex="-1">The circuit board: what the city runs on.</h1>
+        <p class="body">Select a node to see how I use it.</p>
+        <div class="board">
+          ${skills.map((g, gi) => `
+            <div class="bus" style="--bus:${COLORS[g.color]}">
+              <p class="mono bus-name">${esc(g.group)}</p>
+              <ul>
+                ${g.items.map((it, ii) => `<li><button type="button" class="node" data-skill="${gi}-${ii}" aria-pressed="false"><span class="pad" aria-hidden="true"></span>${esc(it.name)}</button></li>`).join('')}
+              </ul>
+            </div>`).join('')}
+        </div>
+        <div class="readout" id="readout" aria-live="polite"><p class="mono readout-k">&gt; select a node</p></div>`;
+
+    case 'experience':
+      return `
+        ${marker(pg)}
+        <h1 id="pageTitle" tabindex="-1">The control center.</h1>
+        <ol class="timeline">
+          ${experience.map((e) => `
+            <li class="module">
+              <p class="mono m-dates">${ph(e.dates)}</p>
+              <h2>${ph(e.role)} <span class="m-org">· ${ph(e.org)}</span></h2>
+              <p class="body">${ph(e.summary)}</p>
+              <ul class="m-high">${e.highlights.map((h) => `<li>${ph(h)}</li>`).join('')}</ul>
+            </li>`).join('')}
+        </ol>
+        <p class="mono resume">${links.resume ? link(links.resume, 'View the full résumé ↗') : '<span class="ph">[add your résumé PDF to show a download link]</span>'}</p>`;
+
+    case 'contact': {
+      const rows = [
+        ['Email', links.email ? `mailto:${links.email}` : '', links.email || '[add your email]'],
+        ['LinkedIn', links.linkedin, links.linkedin ? 'linkedin' : '[add LinkedIn URL]'],
+        ['GitHub', links.github, links.github ? links.github.replace(/^https?:\/\/(www\.)?/, '') : '[add GitHub URL]'],
+        ['Résumé', links.resume, links.resume ? 'download PDF' : '[add résumé PDF]'],
+      ];
+      return `
+        ${marker(pg)}
+        <h1 id="pageTitle" tabindex="-1" class="big">${esc(contact.title)}</h1>
+        <p class="body">${esc(contact.body)}</p>
+        <ul class="contact-list">
+          ${rows.map(([k, href, label]) => `<li><span class="mono ck">${k}</span>${href ? link(href, label) : `<span class="ph">${esc(label)}</span>`}</li>`).join('')}
+        </ul>`;
     }
   }
+  return '';
+}
 
-  // scroll position -> 0..4 (fractional), and back
-  function progressAt(y) {
-    if (y <= anchors[0]) return 0;
-    for (let i = 0; i < anchors.length - 1; i++) {
-      if (y < anchors[i + 1]) return i + (y - anchors[i]) / (anchors[i + 1] - anchors[i]);
+// next / previous building, so a visitor can tour the city page by page
+function pagerHTML(pg) {
+  const i = PAGES.indexOf(pg);
+  const prev = PAGES[i - 1];
+  const next = PAGES[i + 1];
+  return `
+    <nav class="pager" aria-label="More pages">
+      ${prev ? `<a href="#/${prev.id}" class="mono"><span>← ${prev.marker}</span>${prev.name}</a>` : '<a href="#/" class="mono"><span>← 01</span>The City</a>'}
+      ${next ? `<a href="#/${next.id}" class="mono next"><span>${next.marker} →</span>${next.name}</a>` : '<a href="#/" class="mono next"><span>01 →</span>The City</a>'}
+    </nav>
+    <p class="mono foot">© ${new Date().getFullYear()} ${esc(person.name)} · hand-built city · no trackers</p>`;
+}
+
+// ---------- the home screen ----------
+function renderHome() {
+  $('#main').innerHTML = `
+  <section class="hero" id="home" aria-labelledby="hero-title">
+    <div class="col">
+      <p class="eyebrow mono">${esc(person.eyebrow)}</p>
+      <h1 id="hero-title">${person.headline.map((l) => `<span>${esc(l)}</span>`).join('')}</h1>
+      <p class="intro">${esc(person.intro)}</p>
+      <div class="ctas">
+        <a class="btn primary" href="#/work">Explore my work <span aria-hidden="true">→</span></a>
+        <a class="btn ghost" href="#/about">About me</a>
+      </div>
+      <p class="hint mono">click a building to enter · or open the <button type="button" class="linklike" data-open-dir>directory</button></p>
+    </div>
+    <div class="hero-foot mono" aria-hidden="true">
+      <span class="status"><span class="status-dot"></span>System online</span>
+      <span>${LANDMARKS.length} buildings · ${PAGES.length} districts</span>
+    </div>
+  </section>`;
+
+  $('#navLinks').innerHTML = PAGES.map((p) => `<a href="#/${p.id}" data-nav="${p.id}">${p.label}</a>`).join('');
+  $('#dirList').innerHTML = LANDMARKS.map((l) => `
+    <li><a href="${l.target}" data-dir>
+      <span class="d-dot" style="--dot:${COLORS[l.core ? 'cyan' : l.color]}"></span>
+      <span class="d-name">${esc(l.name)}</span><span class="d-sub">${esc(l.sub)}</span><span class="d-go">Enter →</span>
+    </a></li>`).join('');
+}
+renderHome();
+
+// ---------- directory ----------
+const dir = $('#directory');
+const openDir = () => { if (typeof dir.showModal === 'function') dir.showModal(); else dir.setAttribute('open', ''); };
+const closeDir = () => (typeof dir.close === 'function' ? dir.close() : dir.removeAttribute('open'));
+$('#dirOpen').addEventListener('click', openDir);
+$$('[data-open-dir]').forEach((b) => b.addEventListener('click', openDir));
+$('#dirClose').addEventListener('click', closeDir);
+dir.addEventListener('click', (e) => { if (e.target === dir) closeDir(); });
+$$('[data-dir]').forEach((a) => a.addEventListener('click', closeDir));
+
+// ---------- the city ----------
+const city = createCity($('#city'), {
+  labelLayer: $('#labels'),
+  tooltip: $('#tooltip'),
+  onEnter: (lm) => { location.hash = lm.target; },
+  reducedMotion: () => reduced.matches,
+});
+if (!city) document.documentElement.classList.add('no-canvas');
+
+// camera: the whole chip at home, or flown down to one building
+function homeView() {
+  return isPhone()
+    ? { yaw: 45, pitch: 33, zoom: 1.0, tx: 0, ty: 0, tz: 4, ox: 0, oy: -0.24, labels: 1, glow: 0, lmx: 0 }
+    : { yaw: 45, pitch: 33, zoom: 0.94, tx: 0, ty: 0, tz: 4, ox: 0.23, oy: 0.04, labels: 1, glow: 0, lmx: 0 };
+}
+// each building gets its own angle, so every dive feels like arriving somewhere different
+const ANGLES = { hq: 20, 'data-tower': 15, relay: 70, lab: 80, stack: 30, control: 60, core: 45 };
+function focusView(lm) {
+  const core = !!lm.core;
+  const h = core ? 0 : lm.roof === 'spire' ? lm.h * 1.14 : lm.h;
+  const zoom = core ? 3.2 : Math.max(2.4, Math.min(4.2, 95 / (h + 12)));
+  const yaw = ANGLES[lm.id] ?? 45;
+  return isPhone()
+    ? { yaw, pitch: core ? 46 : 24, zoom: zoom * 0.8, tx: lm.x, ty: lm.y, tz: h * 0.5, ox: 0, oy: -0.33, labels: 0, glow: core ? 1 : 0, lmx: 0 }
+    : { yaw, pitch: core ? 46 : 24, zoom, tx: lm.x, ty: lm.y, tz: h * 0.45, ox: 0.25, oy: 0.04, labels: 0, glow: core ? 1 : 0, lmx: 0 };
+}
+
+// ---------- router ----------
+const sheet = $('#sheet');
+const body = $('#sheetBody');
+let current = null;        // open page id, or null at home
+let openTimer = 0;
+let returnFocus = null;
+
+function parse(hash) {
+  const m = /^#\/([\w-]+)(?:\/([\w-]+))?/.exec(hash || '');
+  if (!m) return null;
+  const pg = PAGES.find((p) => p.id === m[1]);
+  return pg ? { pg, sub: m[2] || null } : null;
+}
+
+function route() {
+  clearTimeout(openTimer);
+  const r = parse(location.hash);
+  $$('[data-nav]').forEach((n) => n.toggleAttribute('aria-current', !!r && n.dataset.nav === r.pg.id));
+
+  if (!r) {
+    // back to the city
+    if (current) {
+      current = null;
+      sheet.classList.remove('open');
+      document.body.classList.remove('page-open');
+      openTimer = setTimeout(() => { sheet.hidden = true; }, reduced.matches ? 0 : 450);
+      document.title = 'Joe Waldrop — Building systems, connecting ideas';
+      if (returnFocus && document.contains(returnFocus)) returnFocus.focus({ preventScroll: true });
     }
-    return anchors.length - 1;
-  }
-  function scrollFor(p) {
-    p = clamp(p, 0, anchors.length - 1);
-    const i = Math.min(Math.floor(p), anchors.length - 2);
-    return anchors[i] + (p - i) * (anchors[i + 1] - anchors[i]);
+    city && city.setFocus(null);
+    city && city.setView(homeView(), false, 3.2);
+    return;
   }
 
-  function paint(p, effective) {
-    const r = 180 - STEP * effective;  // the current section sits at the bottom, under the runner
-    rotor.style.transform = `rotate(${r}deg)`;
-    labels.forEach((l) => { l.style.transform = `translate(-50%, -50%) rotate(${-r}deg)`; });
+  // a project inside Work flies to that project's own building
+  const project = r.sub ? projects.find((p) => p.id === r.sub) : null;
+  const lm = lmById(project ? project.landmark : r.pg.landmark);
+  if (!current) returnFocus = document.activeElement;
 
-    // the unicorn stays ahead on the floor; the gap closes from 34° to 13° across the run
-    const gap = (34 - 5.25 * p) * Math.PI / 180;
-    const R = 168 / 520;
-    unicorn.style.left = `${(0.5 - R * Math.sin(gap)) * 100}%`;
-    unicorn.style.top = `${(0.5 + R * Math.cos(gap)) * 100}%`;
+  const switching = current && current !== r.pg.id;
+  const same = current === r.pg.id;
+  current = r.pg.id;
+  document.body.classList.add('page-open');
+  document.title = `${r.pg.label} — Joe Waldrop`;
+  city && city.setFocus(lm.id);
+  city && city.setView(focusView(lm), false, 2.6);
 
-    const a = clamp(Math.round(p), 0, 4);
-    if (a !== lastActive) {
-      segs.forEach((s, i) => s.classList.toggle('is-active', i === a));
-      labels.forEach((l, i) => l.classList.toggle('is-active', i === a));
-      blocks.forEach((b, i) => b.classList.toggle('is-active', i === a));
-      hubN.textContent = String(a + 1).padStart(2, '0');
-      lastActive = a;
+  const show = () => {
+    if (!same) {
+      body.innerHTML = `<div class="page page-${r.pg.id}">${pageHTML(r.pg)}${pagerHTML(r.pg)}</div>`;
+      wirePage();
+      body.scrollTop = 0;
     }
-    const lapText = lap > 0 ? `lap ${lap + 1} · ` : '';
-    quest.textContent = window.scrollY < 8 && lap === 0 ? 'scroll to start the run.' : lapText + QUEST[a];
-  }
-
-  function update() {
-    frame = 0;
-    if (override) return;
-    const p = progressAt(window.scrollY);
-    paint(p, p + 5 * lap);
-  }
-  const queue = () => { if (!frame) frame = requestAnimationFrame(update); };
-
-  function setRunning(on) {
-    [runner, unicorn].forEach((el) => {
-      el.classList.toggle('running', on);
-      el.classList.toggle('idle', !on);
-    });
-  }
-  function nudgeRun() {
-    setRunning(true);
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => { if (!drag && !override) setRunning(false); }, 180);
-  }
-
-  window.addEventListener('scroll', () => { queue(); nudgeRun(); }, { passive: true });
-  window.addEventListener('resize', () => { measure(); queue(); });
-  window.addEventListener('load', () => { measure(); queue(); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measure(); queue(); });
-
-  const smooth = () => (reduced.matches ? 'auto' : 'smooth');
-  const goTo = (i) => window.scrollTo({ top: scrollFor(i), behavior: smooth() });
-
-  // ---- click a segment to jump there ----
-  segs.forEach((s) => s.addEventListener('click', () => {
-    if (suppressClick) return;
-    goTo(Number(s.dataset.i));
-  }));
-
-  // ---- drag the wheel to scroll the page ----
-  const angleAt = (e) => {
-    const r = wheel.getBoundingClientRect();
-    return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI;
+    $('#sheetWhere').textContent = `${r.pg.marker} / 06 · ${lm.name}`;
+    sheet.hidden = false;
+    void sheet.offsetWidth;
+    sheet.classList.add('open');
+    if (project) {
+      const el = $('#project-' + project.id, body);
+      if (el) {
+        el.scrollIntoView({ block: 'start', behavior: same && !reduced.matches ? 'smooth' : 'auto' });
+        el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+      }
+    }
+    if (!same) { const t = $('#pageTitle', body); t && t.focus({ preventScroll: true }); }
   };
 
-  wheel.addEventListener('pointerdown', (e) => {
-    if (override) return;
-    measure();
-    drag = { id: e.pointerId, start: angleAt(e), last: 0, p0: progressAt(window.scrollY), moved: false, t: performance.now(), vel: 0 };
-  });
-
-  wheel.addEventListener('pointermove', (e) => {
-    if (!drag || e.pointerId !== drag.id) return;
-    let delta = angleAt(e) - drag.start;
-    while (delta - drag.last > 180) delta -= 360;
-    while (delta - drag.last < -180) delta += 360;
-    const now = performance.now();
-    drag.vel = 0.7 * drag.vel + 0.3 * ((delta - drag.last) / Math.max(1, now - drag.t));
-    drag.last = delta;
-    drag.t = now;
-    if (!drag.moved && Math.abs(delta) > 4) {
-      drag.moved = true;
-      try { wheel.setPointerCapture(drag.id); } catch (_) {}
-      wheel.classList.add('is-dragging');
-    }
-    if (!drag.moved) return;
-    // turning the wheel counter-clockwise moves forward through the content
-    const p = clamp(drag.p0 - delta / STEP, 0, 4);
-    window.scrollTo({ top: scrollFor(p), behavior: 'auto' });
-  });
-
-  function endDrag() {
-    const d = drag;
-    drag = null;
-    if (!d) return;
-    wheel.classList.remove('is-dragging');
-    if (!d.moved) return;
-    suppressClick = true;
-    setTimeout(() => { suppressClick = false; }, 0);
-    const fling = clamp(-d.vel * 2, -1, 1);        // a quick flick carries one extra section
-    const p = progressAt(window.scrollY);
-    goTo(clamp(Math.round(p + fling), 0, 4));
+  if (reduced.matches || same) show();
+  else if (switching) {
+    // fade the old page out while the camera moves, then bring the new one in
+    sheet.classList.add('swap');
+    openTimer = setTimeout(() => { sheet.classList.remove('swap'); show(); }, 550);
+  } else {
+    sheet.classList.remove('open');
+    openTimer = setTimeout(show, 750);   // let the camera arrive first
   }
-  wheel.addEventListener('pointerup', endDrag);
-  wheel.addEventListener('pointercancel', endDrag);
+}
 
-  // ---- run it again: the wheel keeps turning forward into 01 ----
-  $('#restart').addEventListener('click', () => {
-    if (override) return;
-    const fromEff = progressAt(window.scrollY) + 5 * lap;
-    const toEff = 5 * (lap + 1);
-    const dur = reduced.matches ? 0 : 800;
-    const t0 = performance.now();
-    override = true;
-    setRunning(true);
-    content.classList.add('is-fading');
-
-    let jumped = false;
-    const tick = (now) => {
-      const t = dur ? clamp((now - t0) / dur, 0, 1) : 1;
-      const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      const eff = fromEff + (toEff - fromEff) * e;
-      // the unicorn dashes back out ahead as the run restarts
-      paint(4 * (1 - e), eff);
-      if (!jumped && t >= 0.3) {
-        jumped = true;
-        window.scrollTo({ top: 0, behavior: 'auto' });
-      }
-      if (t < 1) { requestAnimationFrame(tick); return; }
-      lap += 1;
-      override = null;
-      content.classList.remove('is-fading');
-      setRunning(false);
-      update();
+function wirePage() {
+  $$('.node', body).forEach((btn) => {
+    const showSkill = () => {
+      const [gi, ii] = btn.dataset.skill.split('-').map(Number);
+      const it = skills[gi].items[ii];
+      $$('.node', body).forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      $('#readout', body).innerHTML = `<p class="mono readout-k">&gt; ${esc(it.name.toLowerCase())} <span class="readout-lvl">level: ${ph(it.level)}</span></p><p class="readout-v">${ph(it.use)}</p>`;
     };
-    requestAnimationFrame(tick);
+    btn.addEventListener('click', showSkill);
+    btn.addEventListener('mouseenter', showSkill);
   });
+}
 
-  measure();
-  update();
-})();
+window.addEventListener('hashchange', route);
+window.addEventListener('resize', () => {
+  if (!city) return;
+  city.resize();
+  const r = parse(location.hash);
+  if (r) {
+    const project = r.sub ? projects.find((p) => p.id === r.sub) : null;
+    city.setView(focusView(lmById(project ? project.landmark : r.pg.landmark)), true);
+  } else city.setView(homeView(), true);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && current && !dir.open) location.hash = '#/';
+});
+
+// first load: start on the chip; deep links fly straight in
+if (city) city.setView(homeView(), true);
+route();

@@ -2,193 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Joe Waldrop — Curious by default</title>
-  <meta name="description" content="Project manager and analyst working across technology, data and operations. Curious by default.">
-  <meta name="theme-color" content="#080A09">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Joe Waldrop — Building systems, connecting ideas</title>
+  <meta name="description" content="Joe Waldrop works at the intersection of technology, analytics and product execution — turning complex problems into practical solutions.">
+  <meta name="theme-color" content="#070611">
+  <meta property="og:title" content="Joe Waldrop — Chip City">
+  <meta property="og:description" content="A portfolio built as a city on a computer chip: technology, data and product.">
+  <meta property="og:type" content="website">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=VT323&display=swap">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
-<header class="topbar">
-  <a class="logo" href="#top">JW</a>
-  <nav class="links" aria-label="Contact">
-    <a href="#">resume</a>
-    <a href="#">linkedin</a>
-    <a href="#">email</a>
-  </nav>
-</header>
-
-<div class="layout" id="top">
-
-  <main class="content">
-    <section class="hero" data-section="0" aria-labelledby="hero-title">
-      <p class="eyebrow"><span class="amber">joe@portfolio</span>:~$ whoami</p>
-      <h1 id="hero-title">Curious by default.</h1>
-      <p class="intro">Project manager and analyst working across technology, data and operations. I like understanding how things work, finding ways to improve them, and building things when the existing solution falls short.</p>
-    </section>
-
-    <section class="block" id="work" data-section="0" aria-labelledby="work-title">
-      <p class="eyebrow"><span class="amber">~/</span>work</p>
-      <h2 id="work-title"><span class="num">01</span> Work</h2>
-      <p class="lead">Professional projects and case studies.</p>
-      <ul class="rows">
-        <li><a class="row" href="#data"><span class="amber">automated-reporting/</span><span class="muted">Power BI · Planview</span></a></li>
-        <li class="row placeholder"><span>[next-project]/</span><span>[tools]</span></li>
-      </ul>
-    </section>
-
-    <section class="block" id="tech" data-section="1" aria-labelledby="tech-title">
-      <p class="eyebrow"><span class="amber">~/</span>tech</p>
-      <h2 id="tech-title"><span class="num">02</span> Tech</h2>
-      <p class="lead">Systems, integrations, APIs and tools.</p>
-      <ul class="rows">
-        <li class="row placeholder"><span>[integration-project]/</span><span>[tools]</span></li>
-        <li class="row placeholder"><span>[documentation-sample]/</span><span>[tools]</span></li>
-      </ul>
-    </section>
-
-    <section class="block" id="data" data-section="2" aria-labelledby="data-title">
-      <p class="eyebrow"><span class="amber">~/</span>data/automated-reporting</p>
-      <h2 id="data-title"><span class="num">03</span> Automated Reporting Workflows</h2>
-      <p class="lead">Analytics, reporting and automation. <span class="placeholder">role: [your role] · year: [year]</span></p>
-      <dl class="case">
-        <div><dt>Context</dt><dd>Teams tracked project progress in different ways. Pulling a status report together was manual, inconsistent and slow.</dd></div>
-        <div><dt>Approach</dt><dd>Built reporting workflows in Power BI on Planview data, so every team reported progress the same way.</dd></div>
-        <div><dt>Tools</dt><dd>Power BI · Planview · Python <span class="placeholder">[confirm]</span></dd></div>
-        <div><dt>Outcome</dt><dd class="placeholder">[A result you can support.]</dd></div>
-        <div><dt>What I learned</dt><dd class="placeholder">[What you'd repeat or do differently.]</dd></div>
-      </dl>
-    </section>
-
-    <section class="block" id="ideas" data-section="3" aria-labelledby="ideas-title">
-      <p class="eyebrow"><span class="amber">~/</span>ideas</p>
-      <h2 id="ideas-title"><span class="num">04</span> Ideas</h2>
-      <p class="lead">Experiments, prototypes and side projects.</p>
-      <ul class="rows">
-        <li class="row"><span>this-portfolio/</span><span class="muted">a flywheel you can scroll</span></li>
-        <li class="row placeholder"><span>[experiment]/</span><span>[what it explores]</span></li>
-      </ul>
-    </section>
-
-    <section class="block" id="about" data-section="4" aria-labelledby="about-title">
-      <p class="eyebrow"><span class="amber">~/</span>about</p>
-      <h2 id="about-title"><span class="num">05</span> About</h2>
-      <p class="placeholder">[Background: where you've worked and what you did there, in two or three plain sentences.]</p>
-      <p class="placeholder">[Interests outside work.]</p>
-      <p class="contact"><a href="#">resume.pdf</a><a href="#">linkedin</a><a href="#">email</a></p>
-      <p class="again"><button type="button" class="restart" id="restart">↺ run it again</button><span class="muted">the unicorn's still out there.</span></p>
-    </section>
-  </main>
-
-  <aside class="dock" aria-label="Flywheel navigation">
-    <div class="dock-inner">
-      <div class="wheel" id="wheel">
-        <div class="rotor" id="rotor">
-          <svg viewBox="0 0 520 520" aria-hidden="true">
-            <circle cx="260" cy="260" r="248" fill="none" stroke="#62594A" stroke-width="8" stroke-dasharray="3 7"/>
-            <circle cx="260" cy="260" r="238" fill="none" stroke="#62594A" stroke-width="1"/>
-            <path class="seg" data-i="0" d="M131.4,69.3 A230,230 0 0 1 388.6,69.3 L355.1,119.1 A170,170 0 0 0 164.9,119.1 Z"/>
-            <path class="seg" data-i="1" transform="rotate(72 260 260)" d="M131.4,69.3 A230,230 0 0 1 388.6,69.3 L355.1,119.1 A170,170 0 0 0 164.9,119.1 Z"/>
-            <path class="seg" data-i="2" transform="rotate(144 260 260)" d="M131.4,69.3 A230,230 0 0 1 388.6,69.3 L355.1,119.1 A170,170 0 0 0 164.9,119.1 Z"/>
-            <path class="seg" data-i="3" transform="rotate(216 260 260)" d="M131.4,69.3 A230,230 0 0 1 388.6,69.3 L355.1,119.1 A170,170 0 0 0 164.9,119.1 Z"/>
-            <path class="seg" data-i="4" transform="rotate(288 260 260)" d="M131.4,69.3 A230,230 0 0 1 388.6,69.3 L355.1,119.1 A170,170 0 0 0 164.9,119.1 Z"/>
-            <circle cx="260" cy="260" r="168" fill="#0A0C0B" stroke="#62594A" stroke-width="1.5"/>
-            <g stroke="#2C2A24" stroke-width="1.5" stroke-dasharray="4 6">
-              <line x1="260" y1="200" x2="260" y2="94" transform="rotate(36 260 260)"/>
-              <line x1="260" y1="200" x2="260" y2="94" transform="rotate(108 260 260)"/>
-              <line x1="260" y1="200" x2="260" y2="94" transform="rotate(180 260 260)"/>
-              <line x1="260" y1="200" x2="260" y2="94" transform="rotate(252 260 260)"/>
-              <line x1="260" y1="200" x2="260" y2="94" transform="rotate(324 260 260)"/>
-            </g>
-            <circle cx="260" cy="260" r="60" fill="#080A09" stroke="#62594A" stroke-width="1.5"/>
-          </svg>
-          <span class="label" style="left:50%;top:11.54%"><b>01</b> work</span>
-          <span class="label" style="left:86.58%;top:38.12%"><b>02</b> tech</span>
-          <span class="label" style="left:72.61%;top:81.12%"><b>03</b> data</span>
-          <span class="label" style="left:27.39%;top:81.12%"><b>04</b> ideas</span>
-          <span class="label" style="left:13.42%;top:38.12%"><b>05</b> about</span>
-        </div>
-
-        <div class="floor" aria-hidden="true">
-          <div class="sprite unicorn idle" id="unicorn">
-            <svg viewBox="0 -1 12 10" shape-rendering="crispEdges">
-              <g class="body">
-                <rect x="0" y="-1" width="1" height="1" fill="#E5A642"/>
-                <rect x="1" y="0" width="1" height="1" fill="#E5A642"/>
-                <rect x="0" y="1" width="3" height="2" fill="#E7E0D0"/>
-                <rect x="1" y="1" width="1" height="1" fill="#080A09"/>
-                <rect x="3" y="1" width="1" height="3" fill="#E5A642"/>
-                <rect x="3" y="3" width="7" height="3" fill="#E7E0D0"/>
-                <rect x="2" y="3" width="1" height="1" fill="#E7E0D0"/>
-                <rect x="10" y="3" width="2" height="1" fill="#E5A642"/>
-                <rect x="11" y="4" width="1" height="1" fill="#E5A642"/>
-                <g class="fa">
-                  <rect x="3" y="6" width="1" height="2" fill="#E7E0D0"/>
-                  <rect x="4" y="6" width="1" height="3" fill="#E7E0D0"/>
-                  <rect x="7" y="6" width="1" height="3" fill="#E7E0D0"/>
-                  <rect x="9" y="6" width="1" height="3" fill="#E7E0D0"/>
-                </g>
-                <g class="fb">
-                  <rect x="2" y="6" width="1" height="2" fill="#E7E0D0"/>
-                  <rect x="5" y="6" width="1" height="2" fill="#E7E0D0"/>
-                  <rect x="8" y="6" width="1" height="2" fill="#E7E0D0"/>
-                  <rect x="10" y="6" width="1" height="2" fill="#E7E0D0"/>
-                </g>
-              </g>
-            </svg>
-          </div>
-          <div class="sprite runner idle" id="runner">
-            <svg viewBox="0 0 8 10" shape-rendering="crispEdges">
-              <g class="body">
-                <rect x="2" y="0" width="4" height="1" fill="#E5A642"/>
-                <rect x="1" y="1" width="6" height="1" fill="#E5A642"/>
-                <rect x="2" y="2" width="4" height="2" fill="#E7E0D0"/>
-                <rect x="3" y="2" width="1" height="1" fill="#080A09"/>
-                <rect x="6" y="4" width="1" height="2" fill="#62594A"/>
-                <rect x="2" y="4" width="4" height="3" fill="#B9B8B0"/>
-                <rect x="1" y="4" width="1" height="2" fill="#E7E0D0"/>
-                <g class="fa">
-                  <rect x="2" y="7" width="1" height="2" fill="#E7E0D0"/>
-                  <rect x="5" y="7" width="1" height="2" fill="#E7E0D0"/>
-                  <rect x="1" y="9" width="2" height="1" fill="#B9B8B0"/>
-                  <rect x="5" y="9" width="2" height="1" fill="#B9B8B0"/>
-                </g>
-                <g class="fb">
-                  <rect x="3" y="7" width="1" height="2" fill="#E7E0D0"/>
-                  <rect x="4" y="7" width="1" height="1" fill="#E7E0D0"/>
-                  <rect x="5" y="8" width="1" height="1" fill="#E7E0D0"/>
-                  <rect x="2" y="9" width="2" height="1" fill="#B9B8B0"/>
-                  <rect x="6" y="8" width="1" height="1" fill="#B9B8B0"/>
-                </g>
-              </g>
-            </svg>
-          </div>
-        </div>
-
-        <div class="hub" aria-hidden="true">
-          <span class="hub-n" id="hubN">01</span>
-          <span class="hub-of">/05</span>
-        </div>
-      </div>
-
-      <div class="legend">
-        <p class="legend-line"><span class="vt amber">run.log</span> <span id="quest">scroll to start the run.</span></p>
-        <p class="legend-key muted">The runner is me. The unicorn is the next thing worth learning. Scroll, or drag the wheel, and he closes in.</p>
-      </div>
-    </div>
-  </aside>
+<canvas id="city" aria-hidden="true"></canvas>
+<div class="labels" id="labels" aria-label="Buildings in the city"></div>
+<div class="tooltip" id="tooltip" hidden aria-hidden="true">
+  <span class="tt-key">⏎ Enter</span> <strong data-tt-name></strong>
+  <span class="tt-sub" data-tt-sub></span>
 </div>
 
-<footer class="foot">
-  <span>© Joe Waldrop</span>
-  <span class="muted">built by hand · <a href="https://github.com/waldropjoe/waldropjoe.github.io">source</a></span>
-</footer>
+<header class="nav" id="nav">
+  <a class="brand" href="#/" aria-label="Joe Waldrop, back to the city">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="6" height="6" fill="currentColor"/></svg>
+    <span>JW</span>
+  </a>
+  <nav aria-label="Pages" class="nav-links" id="navLinks"></nav>
+  <button type="button" class="dir-btn" id="dirOpen" aria-haspopup="dialog">Directory</button>
+</header>
 
-<script src="main.js"></script>
+<main id="main"></main>
+
+<aside class="sheet" id="sheet" aria-labelledby="pageTitle" hidden>
+  <div class="sheet-bar">
+    <a class="back mono" href="#/">← Back to the city</a>
+    <span class="mono sheet-where" id="sheetWhere"></span>
+  </div>
+  <div class="sheet-body" id="sheetBody" tabindex="-1"></div>
+</aside>
+
+<dialog class="directory" id="directory" aria-labelledby="dirTitle">
+  <div class="dir-inner">
+    <p class="mono dir-title" id="dirTitle">Chip City · Directory</p>
+    <ul class="dir-list" id="dirList"></ul>
+    <button type="button" class="btn ghost" id="dirClose">← Back to the city</button>
+  </div>
+</dialog>
+
+<noscript><p class="noscript">This portfolio draws its city with JavaScript. Please enable it to explore.</p></noscript>
+<script type="module" src="main.js?v=5"></script>
 </body>
 </html>

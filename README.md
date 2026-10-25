@@ -1,13 +1,16 @@
-# waldropjoe.github.io
+# waldropjoe.github.io — Chip City
 
-Personal portfolio: a DOS-style terminal page whose navigation is a flywheel. A pixel adventurer runs inside the wheel chasing a unicorn: each section moves him closer, and after 05 the run loops back to 01.
+A portfolio built as a neon city on a computer chip. Each landmark building is a section or project: hover to inspect, click to enter, or open the Directory for a plain list.
 
-Plain HTML, CSS and JavaScript — no build step.
+No build step and no dependencies — plain HTML, CSS and JavaScript modules.
 
-- `index.html` – page and content (edit the [bracketed] placeholders here)
-- `styles.css` – palette, layout, wheel and sprite animation
-- `main.js` – wheel state, auto-run, drag/flick, keyboard
+| File | What it is |
+| --- | --- |
+| `data.js` | **All content** — projects, skills, experience, links. Edit this to update the site. `[Bracketed]` text is a placeholder and shows dimmed. Empty links are hidden. |
+| `city.js` | The isometric canvas engine: chip, circuit traces, data pulses, buildings, landmark tags, hover/click. Landmark positions are in `LANDMARKS`. |
+| `main.js` | Renders content from `data.js`, scroll-driven camera views per section (`VIEWS`), directory dialog. |
+| `styles.css` | Design tokens, layout, responsive and reduced-motion rules. |
 
-Run locally: open `index.html`, or `python3 -m http.server` in this folder.
+Run locally: `python3 -m http.server` in this folder, then open http://localhost:8000 (modules don't load from `file://`).
 
-Deploys automatically via GitHub Pages from `main`.
+When you change CSS or JS, bump the `?v=` number in `index.html` and in the imports at the top of `main.js` so browsers pick up the new files.
