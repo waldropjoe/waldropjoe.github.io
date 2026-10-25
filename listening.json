@@ -1,1 +1,189 @@
-[]
+[
+  {
+    "id": "spotify:audiobook:3ufnW3kg7QvNLQS7sxIvDq",
+    "type": "audiobook",
+    "status": "done",
+    "title": "The Nine Billion Names of God",
+    "by": "Arthur C. Clarke",
+    "date": "2026-10",
+    "link": "https://open.spotify.com/show/3ufnW3kg7QvNLQS7sxIvDq",
+    "cover": "https://i.scdn.co/image/ab6766630000db5b1c5482f98b1750a835b9a466",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:audiobook:1v9GAJzWb6d0fuHlXO2dHQ",
+    "type": "audiobook",
+    "status": "done",
+    "title": "The Hype Machine: How Social Media Disrupts Our Elections, Our Economy, and Our Health--and How We Must Adapt",
+    "by": "Sinan Aral",
+    "date": "2026-10",
+    "link": "https://open.spotify.com/show/1v9GAJzWb6d0fuHlXO2dHQ",
+    "cover": "https://i.scdn.co/image/ab6766630000db5bf184d342ecaf72f8b8e6539b",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:audiobook:7Ecg0wbGWa5ydhZdaQ94OH",
+    "type": "audiobook",
+    "status": "done",
+    "title": "Probably the Best Book on Statistics Ever Written: How to Beat the Odds and Make Better Decisions",
+    "by": "Haim Shapira",
+    "date": "2026-10",
+    "link": "https://open.spotify.com/show/7Ecg0wbGWa5ydhZdaQ94OH",
+    "cover": "https://i.scdn.co/image/ab6766630000db5b24227581e4a643cc67491bcc",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:audiobook:4hBzB6XsxqiBxF0JDxMOHu",
+    "type": "audiobook",
+    "status": "done",
+    "title": "Manufacturing Consent: The Political Economy of the Mass Media",
+    "by": "Edward S. Herman, Noam Chomsky",
+    "date": "2026-10",
+    "link": "https://open.spotify.com/show/4hBzB6XsxqiBxF0JDxMOHu",
+    "cover": "https://i.scdn.co/image/ab6766630000db5bcb20d2c480f75e936b9fc2f8",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:audiobook:2WAslobguK7brhlngZT5Cv",
+    "type": "audiobook",
+    "status": "done",
+    "title": "A People's History of the United States",
+    "by": "Howard Zinn",
+    "date": "2026-10",
+    "link": "https://open.spotify.com/show/2WAslobguK7brhlngZT5Cv",
+    "cover": "https://i.scdn.co/image/ab6766630000db5bab2168abf654d78e90f65693",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:audiobook:6ohFCPBRvNIIpQf9LXc3y4",
+    "type": "audiobook",
+    "status": "done",
+    "title": "The Challenger Sale: Taking Control of the Customer Conversation",
+    "by": "Matthew Dixon, Brent Adamson",
+    "date": "2026-10",
+    "link": "https://open.spotify.com/show/6ohFCPBRvNIIpQf9LXc3y4",
+    "cover": "https://i.scdn.co/image/ab6766630000db5b5fd02c602fb348c5e0b6823c",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:0nOo7dUvMyjRM5hcPTwbqh",
+    "type": "podcast",
+    "status": "now",
+    "title": "01 - Sam Altman and Dustin Moskovitz - Intro to the course, \"How to Start a Startup\"",
+    "by": "How to Start a Startup",
+    "date": "2025-03",
+    "link": "https://open.spotify.com/episode/0nOo7dUvMyjRM5hcPTwbqh",
+    "cover": "https://i.scdn.co/image/ab67656300005f1ffaf83bcc7913f23bae30cf7c",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:6CIuvP9wOj7tx8xRahLtb2",
+    "type": "podcast",
+    "status": "now",
+    "title": "Spittin’ Chiclets Episode 536: Featuring Rob Gronkowski, Matt Duchene & Yands",
+    "by": "Spittin Chiclets",
+    "date": "2025-01",
+    "link": "https://open.spotify.com/episode/6CIuvP9wOj7tx8xRahLtb2",
+    "cover": "https://i.scdn.co/image/ab67656300005f1ffc87c00718639de1c2a18f56",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:1r0TnaTu9nKo2uWdTZDaNp",
+    "type": "podcast",
+    "status": "now",
+    "title": "Stop Trying to Get Rich. Get Better | Ep 714",
+    "by": "The Game with Alex Hormozi",
+    "date": "2024-07",
+    "link": "https://open.spotify.com/episode/1r0TnaTu9nKo2uWdTZDaNp",
+    "cover": "https://i.scdn.co/image/ab67656300005f1f4159e610afbbaf27db9950a1",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:0Bx6gWK755bUoM238X2Ma1",
+    "type": "podcast",
+    "status": "now",
+    "title": "#419 – Sam Altman: OpenAI, GPT-5, Sora, Board Saga, Elon Musk, Ilya, Power & AGI",
+    "by": "Lex Fridman Podcast",
+    "date": "2024-04",
+    "link": "https://open.spotify.com/episode/0Bx6gWK755bUoM238X2Ma1",
+    "cover": "https://i.scdn.co/image/ab67656300005f1f563ebb538d297875b10114b7",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:5D4rToJ6IW2JsilsvuKeA1",
+    "type": "podcast",
+    "status": "done",
+    "title": "#405 – Jeff Bezos: Amazon and Blue Origin",
+    "by": "Lex Fridman Podcast",
+    "date": "2024-01",
+    "link": "https://open.spotify.com/episode/5D4rToJ6IW2JsilsvuKeA1",
+    "cover": "https://i.scdn.co/image/ab67656300005f1f563ebb538d297875b10114b7",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:5GH7xpml33xt06O2zGvTdW",
+    "type": "podcast",
+    "status": "now",
+    "title": "E467 NYC Garbage Man",
+    "by": "This Past Weekend w/ Theo Von",
+    "date": "2023-11",
+    "link": "https://open.spotify.com/episode/5GH7xpml33xt06O2zGvTdW",
+    "cover": "https://i.scdn.co/image/ab67656300005f1f1d99a20095dbfb239982b42c",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:3IzrLJswCxyemDJ6YbMhSz",
+    "type": "podcast",
+    "status": "now",
+    "title": "Monday Morning Podcast 7-24-23",
+    "by": "Monday Morning Podcast",
+    "date": "2023-07",
+    "link": "https://open.spotify.com/episode/3IzrLJswCxyemDJ6YbMhSz",
+    "cover": "https://i.scdn.co/image/ab67656300005f1f2ec03302769f913fa057771d",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:6Xoel9IVd6EnesiUv9IC41",
+    "type": "podcast",
+    "status": "now",
+    "title": "E420 Neil deGrasse Tyson",
+    "by": "This Past Weekend w/ Theo Von",
+    "date": "2022-11",
+    "link": "https://open.spotify.com/episode/6Xoel9IVd6EnesiUv9IC41",
+    "cover": "https://i.scdn.co/image/ab67656300005f1fa012b1ca9edae4145be239e8",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:1bnXbzThY5TG8SUanNa581",
+    "type": "podcast",
+    "status": "now",
+    "title": "Monday Morning Podcast 12-13-21",
+    "by": "Monday Morning Podcast",
+    "date": "2021-12",
+    "link": "https://open.spotify.com/episode/1bnXbzThY5TG8SUanNa581",
+    "cover": "https://i.scdn.co/image/ab67656300005f1fec1747827090010b6b51bcab",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:45h7rggVBoRwJPKpRNFzsn",
+    "type": "podcast",
+    "status": "done",
+    "title": "#1698 - Neill Blomkamp",
+    "by": "The Joe Rogan Experience",
+    "date": "2021-09",
+    "link": "https://open.spotify.com/episode/45h7rggVBoRwJPKpRNFzsn",
+    "cover": "https://i.scdn.co/image/ab67656300005f1f3d80a53b5bbad591791ea9c1",
+    "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:0mCfpeY0Ga4meTanFzOkkL",
+    "type": "podcast",
+    "status": "done",
+    "title": "#1597 - Travis Walton",
+    "by": "The Joe Rogan Experience",
+    "date": "2021-03",
+    "link": "https://open.spotify.com/episode/0mCfpeY0Ga4meTanFzOkkL",
+    "cover": "https://i.scdn.co/image/ab67656300005f1f66cc197bd4b64125766807aa",
+    "source": "spotify"
+  }
+]
