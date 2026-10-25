@@ -1,5 +1,5 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=12';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=12';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=13';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=13';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -173,7 +173,8 @@ function allListening() {
   });
   const leftover = [...notes.values()].filter((x) => x.title);   // notes for items not synced yet
   return [...synced, ...leftover, ...manual]
-    .filter((x) => !x.hide && x.title)
+    // placeholder entries like '[Book title]' stay out of the live log
+    .filter((x) => !x.hide && x.title && !/^\s*\[.*\]\s*$/.test(x.title))
     .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
 }
 
