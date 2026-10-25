@@ -1,6 +1,6 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=16';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=16';
-import * as content from './data.js?v=16';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=18';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=18';
+import * as content from './data.js?v=18';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -27,7 +27,7 @@ const PAGES = [
 
 const marker = (pg) => `<p class="marker mono"><span class="marker-n">${pg.marker}</span><span class="marker-line" aria-hidden="true"></span>${pg.name}</p>`;
 
-function pageHTML(pg) {
+function pageHTML(pg, sub) {
   switch (pg.id) {
     case 'about':
       return `
@@ -36,33 +36,49 @@ function pageHTML(pg) {
         ${about.body.map((p) => `<p class="body">${ph(p)}</p>`).join('')}
         <ol class="principles">
           ${about.principles.map((p) => `<li><span class="mono code">${esc(p.code)}</span><span>${ph(p.text)}</span></li>`).join('')}
-        </ol>`;
+        </ol>
+        ${about.education && about.education.length ? `
+        <h2 class="sub-h">Education</h2>
+        <ul class="edu">
+          ${about.education.map((e) => `<li><p class="edu-school">${esc(e.school)}</p><p class="edu-degree">${esc(e.degree)}</p>${e.note ? `<p class="mono edu-note">${esc(e.note)}</p>` : ''}</li>`).join('')}
+        </ul>` : ''}`;
 
-    case 'work':
+    case 'work': {
+      // a single project: its own page, reached from its building
+      const p = sub ? projects.find((x) => x.id === sub) : null;
+      if (p) {
+        const lm = lmById(p.landmark);
+        const plinks = [link(p.links.caseStudy, 'Case study ↗'), link(p.links.demo, 'Live demo ↗'), link(p.links.source, 'Source ↗')].filter(Boolean).join('');
+        return `
+        <p class="mono crumb"><a href="#/work">← All work</a></p>
+        <article class="project featured solo" style="--accent:${COLORS[lm ? lm.color : 'cyan']}">
+          <p class="mono p-meta"><span class="p-dot" aria-hidden="true"></span>${lm ? `${esc(lm.name)} · ` : ''}${ph(p.category)}</p>
+          <h1 id="pageTitle" tabindex="-1">${ph(p.name)}</h1>
+          <p class="mono p-sub">${ph(p.role)} · ${ph(p.year)}</p>
+          <dl class="p-grid">
+            <div><dt class="mono">Problem</dt><dd>${ph(p.problem)}</dd></div>
+            <div><dt class="mono">Approach</dt><dd>${ph(p.approach)}</dd></div>
+            <div><dt class="mono">Tools</dt><dd class="chips">${p.tools.map((t) => `<span class="chip">${ph(t)}</span>`).join('')}</dd></div>
+            ${p.outcome ? `<div><dt class="mono">Outcome</dt><dd>${ph(p.outcome)}</dd></div>` : ''}
+          </dl>
+          ${plinks ? `<p class="p-links mono">${plinks}</p>` : ''}
+        </article>`;
+      }
+      // the index: one line per project
       return `
         ${marker(pg)}
-        <h1 id="pageTitle" tabindex="-1">Selected work. Each one is a building in the city.</h1>
-        <div class="projects">
-          ${projects.map((p, i) => {
-            const lm = lmById(p.landmark);
-            const plinks = [link(p.links.caseStudy, 'Case study ↗'), link(p.links.demo, 'Live demo ↗'), link(p.links.source, 'Source ↗')].filter(Boolean).join('');
-            return `
-            <article class="project${i === 0 ? ' featured' : ''}" id="project-${p.id}" style="--accent:${COLORS[lm ? lm.color : 'cyan']}">
-              <header class="p-head">
-                <p class="mono p-meta"><span class="p-dot" aria-hidden="true"></span>${esc(lm ? lm.name : 'Building')} · ${ph(p.category)}</p>
-                <h2>${ph(p.name)}</h2>
-                <p class="mono p-sub">${ph(p.role)} · ${ph(p.year)}</p>
-              </header>
-              <dl class="p-grid">
-                <div><dt class="mono">Problem</dt><dd>${ph(p.problem)}</dd></div>
-                <div><dt class="mono">Approach</dt><dd>${ph(p.approach)}</dd></div>
-                <div><dt class="mono">Tools</dt><dd class="chips">${p.tools.map((t) => `<span class="chip">${ph(t)}</span>`).join('')}</dd></div>
-                <div><dt class="mono">Outcome</dt><dd>${ph(p.outcome)}</dd></div>
-              </dl>
-              ${plinks ? `<p class="p-links mono">${plinks}</p>` : ''}
-            </article>`;
+        <h1 id="pageTitle" tabindex="-1">Selected work.</h1>
+        <p class="body">Some projects have their own building in the city — drive there, or pick one here.</p>
+        <ul class="work-index">
+          ${projects.map((x) => {
+            const lm = lmById(x.landmark);
+            return `<li style="--accent:${COLORS[lm ? lm.color : 'cyan']}"><a href="#/work/${x.id}">
+              <span class="wi-main"><span class="mono wi-meta"><span class="p-dot" aria-hidden="true"></span>${lm ? esc(lm.name) : 'Project'} · ${ph(x.year)}</span><span class="wi-name">${ph(x.name)}</span><span class="wi-cat">${ph(x.category)}</span></span>
+              <span class="mono wi-go" aria-hidden="true">Open →</span>
+            </a></li>`;
           }).join('')}
-        </div>`;
+        </ul>`;
+    }
 
     case 'skills':
       return `
@@ -90,7 +106,8 @@ function pageHTML(pg) {
               <p class="mono m-dates">${ph(e.dates)}</p>
               <h2>${ph(e.role)} <span class="m-org">· ${ph(e.org)}</span></h2>
               <p class="body">${ph(e.summary)}</p>
-              <ul class="m-high">${e.highlights.map((h) => `<li>${ph(h)}</li>`).join('')}</ul>
+              ${e.highlights.length ? `<ul class="m-high">${e.highlights.map((h) => `<li>${ph(h)}</li>`).join('')}</ul>` : ''}
+              ${(e.projects || []).length ? `<p class="mono m-proj">Projects: ${e.projects.map((id) => projects.find((x) => x.id === id)).filter(Boolean).map((x) => `<a href="#/work/${x.id}">${esc(x.name)} →</a>`).join('')}</p>` : ''}
             </li>`).join('')}
         </ol>
         <p class="mono resume">${links.resume ? link(links.resume, 'View the full résumé ↗') : '<span class="ph">[add your résumé PDF to show a download link]</span>'}</p>`;
@@ -375,14 +392,16 @@ function route() {
 
   // a project inside Work flies to that project's own building
   const project = r.sub ? projects.find((p) => p.id === r.sub) : null;
-  const lm = lmById(project ? project.landmark : r.pg.landmark);
+  // projects without their own building fly to the page's building
+  const lm = lmById(project && project.landmark ? project.landmark : r.pg.landmark);
   if (!current) { returnFocus = document.activeElement; city && city.saveView(); }
 
-  const switching = current && current !== r.pg.id;
-  const same = current === r.pg.id;
-  current = r.pg.id;
+  const key = r.pg.id + (r.sub ? '/' + r.sub : '');   // each project is its own page
+  const switching = current && current !== key;
+  const same = current === key;
+  current = key;
   document.body.classList.add('page-open');
-  document.title = `${r.pg.label} — Joe Waldrop`;
+  document.title = `${project ? project.name : r.pg.label} — Joe Waldrop`;
   city && city.setFocus(lm.id);
   city && city.parkAt(lm.id);
   promptEl.hidden = true;
@@ -390,7 +409,7 @@ function route() {
 
   const show = () => {
     if (!same) {
-      body.innerHTML = `<div class="page page-${r.pg.id}">${pageHTML(r.pg)}${pagerHTML(r.pg)}</div>`;
+      body.innerHTML = `<div class="page page-${r.pg.id}">${pageHTML(r.pg, project ? project.id : null)}${pagerHTML(r.pg)}</div>`;
       wirePage();
       body.scrollTop = 0;
     }
@@ -398,13 +417,6 @@ function route() {
     sheet.hidden = false;
     void sheet.offsetWidth;
     sheet.classList.add('open');
-    if (project) {
-      const el = $('#project-' + project.id, body);
-      if (el) {
-        el.scrollIntoView({ block: 'start', behavior: same && !reduced.matches ? 'smooth' : 'auto' });
-        el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
-      }
-    }
     if (!same) { const t = $('#pageTitle', body); t && t.focus({ preventScroll: true }); }
   };
 
@@ -460,7 +472,7 @@ function wirePage() {
       const [gi, ii] = btn.dataset.skill.split('-').map(Number);
       const it = skills[gi].items[ii];
       $$('.node', body).forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-      $('#readout', body).innerHTML = `<p class="mono readout-k">&gt; ${esc(it.name.toLowerCase())} <span class="readout-lvl">level: ${ph(it.level)}</span></p><p class="readout-v">${ph(it.use)}</p>`;
+      $('#readout', body).innerHTML = `<p class="mono readout-k">&gt; ${esc(it.name.toLowerCase())} ${it.level ? `<span class="readout-lvl">${ph(it.level)}</span>` : ''}</p><p class="readout-v">${ph(it.use)}</p>`;
     };
     btn.addEventListener('click', showSkill);
     btn.addEventListener('mouseenter', showSkill);

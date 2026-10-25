@@ -303,7 +303,30 @@ body.page-open .hero { opacity: 0; visibility: hidden; transition: opacity .3s e
 .principles li::after { content: ''; position: absolute; left: -21px; top: 19px; width: 7px; height: 7px; border-radius: 50%; background: var(--bg); border: 1px solid var(--yellow); }
 .code { color: var(--yellow); font-size: 11px; padding-top: 4px; }
 
+/* about: education */
+.page .sub-h { margin: 44px 0 14px; font-size: 22px; }
+.edu { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.edu li { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.edu p { margin: 0; }
+.edu-school { font-weight: 500; }
+.edu-degree { color: var(--muted); font-size: 15px; }
+.edu-note { margin-top: 6px !important; color: var(--yellow); font-size: 10px; }
+
 /* work */
+.crumb { margin: 0 0 22px; font-size: 11px; }
+.crumb a { color: var(--cyan); text-decoration: none; }
+.project.solo { padding: 0 0 0 20px; border: 0; }
+.project.solo::before { top: 4px; bottom: 4px; }
+.page .project.solo h1 { margin: 6px 0 4px; }
+.work-index { list-style: none; margin: 8px 0 0; padding: 0; border-top: 1px solid var(--line); }
+.work-index li { border-bottom: 1px solid var(--line); }
+.work-index a { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 4px 18px 16px; color: var(--text); text-decoration: none; border-left: 2px solid var(--accent); }
+.work-index a:hover { background: var(--bg2); }
+.wi-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.wi-meta { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 10px; }
+.wi-name { font: 700 19px var(--display); letter-spacing: -.01em; }
+.wi-cat { color: var(--muted); font-size: 14px; }
+.wi-go { flex: none; color: var(--accent); font-size: 11px; }
 .projects { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
 .project { position: relative; padding: 26px 0 28px 20px; border-bottom: 1px solid var(--line); }
 .project::before { content: ''; position: absolute; left: 0; top: 30px; bottom: 30px; width: 2px; background: var(--accent); opacity: .7; }
@@ -463,3 +486,7 @@ body.page-open .hero { opacity: 0; visibility: hidden; transition: opacity .3s e
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+.m-proj { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 10px 0 0; font-size: 11px; color: var(--muted); }
+.m-proj a { color: var(--cyan); text-decoration: none; }
+.m-proj a:hover { text-decoration: underline; }

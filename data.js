@@ -13,120 +13,194 @@ export const person = {
 };
 
 export const links = {
-  email: '',                                  // e.g. 'you@example.com'
-  linkedin: '',                               // e.g. 'https://www.linkedin.com/in/…'
+  email: 'joewaldrop98@gmail.com',
+  linkedin: 'https://www.linkedin.com/in/joseph-waldrop-44a540175',
   github: 'https://github.com/waldropjoe',
-  resume: '',                                 // e.g. 'resume.pdf' (add the PDF to the repo)
+  resume: 'Joseph_Waldrop_Resume.pdf',      // the PDF sits next to index.html in the repo
 };
 
 export const about = {
   title: 'The infrastructure under the city.',
   body: [
-    'I’m a project manager and analyst. Most of my work sits between the people who need something and the systems that have to deliver it.',
-    'I like understanding how things work, finding where a process leaks time or clarity, and building the thing that fixes it — a report, an integration, a workflow, or a plan people actually follow.',
+    'I’m a project manager at HCA Healthcare’s Parallon in Nashville, coordinating AI-enabled revenue cycle initiatives built on Palantir Foundry.',
+    'Before that I spent several years on the systems side: implementing tax technology integrated with SAP at KPMG and Ducharme, McMillen & Associates — mapping data, testing API integrations, and supporting go-lives — and running a revenue cycle application program at Parallon.',
+    'Most of my work sits between the people who need something and the systems that have to deliver it. I like understanding how things work, finding where a process leaks time or clarity, and building the thing that fixes it.',
   ],
   principles: [
     { code: 'REQ → BUILD', text: 'Translate business requirements into technical work a team can deliver.' },
     { code: 'SYSTEMS', text: 'Map how data and tools connect before changing any one of them.' },
     { code: 'SHIP', text: 'Prefer a practical, working outcome over a perfect plan.' },
   ],
+  education: [
+    { school: 'Belmont University', degree: 'Master of Accountancy (MAcc), Emphasis in Data Analytics, Cum Laude', note: 'Dean’s List' },
+    { school: 'Southern Illinois University Edwardsville', degree: 'Bachelor of Science in Accountancy, Cum Laude', note: '' },
+  ],
 };
 
-// Each project is a building in the city. `landmark` links it to a
-// building on the chip (see city.js LANDMARKS).
+// Each project is a building in the city. `landmark` links it to a building on the
+// chip (see city.js LANDMARKS); projects without one are listed on the Work page only.
 export const projects = [
   {
     id: 'reporting',
     landmark: 'data-tower',
-    name: 'Automated Reporting Workflows',
+    name: 'Automated Project Reporting',
     category: 'Data analytics · Reporting automation',
-    problem: 'Teams tracked project progress in different ways. Pulling a status report together was manual, inconsistent and slow.',
-    approach: 'Built reporting workflows in Power BI on Planview data, so every team reported progress the same way.',
-    tools: ['Power BI', 'Planview', 'Python [confirm]'],
-    outcome: '[A result you can support — e.g. hours saved per reporting cycle, or teams onboarded.]',
-    role: '[Your role]',
-    year: '[Year]',
+    problem: 'Project information for a revenue cycle application program lived in manual status reports, which took time to assemble and was hard for teams to get to.',
+    approach: 'Assisted with developing Power BI reporting workflows and helped teams adopt automated reporting in place of manual status updates.',
+    tools: ['Power BI'],
+    outcome: 'Reduced manual reporting effort and improved access to project information.',
+    role: 'Project Manager · HCA Healthcare, Parallon',
+    year: '2023–2025',
     links: { caseStudy: '', demo: '', source: '' },
   },
   {
     id: 'integration',
     landmark: 'relay',
-    name: '[Integration project]',
-    category: 'API integrations · Backend',
-    problem: '[What needed to connect, and why it mattered.]',
-    approach: '[How you approached it.]',
-    tools: ['[tool]', '[tool]'],
-    outcome: '[Outcome or current status.]',
-    role: '[Your role]',
-    year: '[Year]',
+    name: 'ERP ↔ Tax Engine Integrations',
+    category: 'API integrations · Data mapping · Testing',
+    problem: 'Enterprise clients implementing tax technology (Vertex O-Series and others) needed their ERP systems, often SAP ECC, to exchange transaction data with the tax engine correctly.',
+    approach: 'Gathered integration requirements, built data mappings, developed and tested REST API requests in Postman, ran system integration and user acceptance tests, and worked defects through with technical teams. Prepared cutover plans for go-live.',
+    tools: ['Postman', 'REST APIs', 'SAP ECC', 'Vertex O-Series', 'Python', 'Alteryx'],
+    outcome: 'Supported three Vertex O-Series go-lives across roughly 8–10 implementation engagements, then four more enterprise engagements at KPMG.',
+    role: 'Associate Consultant → Consultant (DMA) · Senior Associate (KPMG)',
+    year: '2021–2026',
+    links: { caseStudy: '', demo: '', source: '' },
+  },
+  {
+    id: 'migration',
+    name: 'Legacy Tax Data Migration',
+    category: 'Python · Data migration',
+    problem: 'Clients moving from Vertex Q-Series to O-Series had legacy data that had to be carried over.',
+    approach: 'Wrote Python scripts to help migrate the legacy Q-Series data instead of moving it by hand.',
+    tools: ['Python'],
+    outcome: 'Reduced client-billed project hours by 15%.',
+    role: 'Associate Consultant · DMA',
+    year: '2021–2023',
+    links: { caseStudy: '', demo: '', source: '' },
+  },
+  {
+    id: 'cloud-migration',
+    name: 'Payment Collection System Cloud Migration',
+    category: 'Program delivery · Cloud migration',
+    problem: 'A payment collection system was moving to the cloud while two connected systems were being upgraded — with four downstream teams, dependent applications and facility websites relying on it.',
+    approach: 'Owned the project plan and risk tracking, coordinating the vendor integration partner, the upgrading systems and every downstream team.',
+    tools: ['Project planning', 'Risk tracking', 'Vendor coordination'],
+    outcome: '',   // add one when you can support it; the row is hidden while empty
+    role: 'Project Manager · HCA Healthcare, Parallon',
+    year: '2023–2025',
     links: { caseStudy: '', demo: '', source: '' },
   },
   {
     id: 'ideas',
     landmark: 'lab',
-    name: 'This portfolio',
+    name: 'Waldropolis (this site)',
     category: 'Product concept · Interactive application',
     problem: 'A résumé lists what you did. It doesn’t show how you think about systems.',
-    approach: 'Designed and built a city on a computer chip: a hand-written isometric canvas engine, scroll-driven camera and data-driven content.',
-    tools: ['JavaScript', 'Canvas 2D', 'HTML/CSS'],
-    outcome: 'Live on GitHub Pages.',
+    approach: 'Designed and built a city on a computer chip: a hand-written isometric canvas engine, a drivable car, and data-driven pages — plus a GitHub Action that syncs a curated Spotify playlist into the Listening Post.',
+    tools: ['JavaScript', 'Canvas 2D', 'Python', 'GitHub Actions', 'Spotify Web API'],
+    outcome: 'Live on GitHub Pages; the Listening Post updates itself daily.',
     role: 'Design & build',
     year: '2026',
     links: { caseStudy: '', demo: '', source: 'https://github.com/waldropjoe/waldropjoe.github.io' },
   },
 ];
 
-// Skills as nodes on a circuit. `level` is shown as-is: keep it honest.
-// Replace '[set]' with: 'daily', 'regular', 'working knowledge' or 'exploring'.
+// Skills as nodes on a circuit. `level` is optional and shown as-is — only set it
+// where it's honest (the résumé marks SQL and Git as working knowledge).
 export const skills = [
   {
-    group: 'Programming & data',
-    color: 'cyan',
-    items: [
-      { name: 'Python', level: '[set]', use: '[How you use it — e.g. scripts that clean and reshape data before reporting.]' },
-      { name: 'SQL', level: '[set]', use: '[How you use it.]' },
-    ],
-  },
-  {
-    group: 'Analytics & visualization',
-    color: 'yellow',
-    items: [
-      { name: 'Power BI', level: '[set]', use: 'Reporting workflows and dashboards that standardized project reporting.' },
-      { name: 'Alteryx', level: '[set]', use: '[How you use it.]' },
-    ],
-  },
-  {
-    group: 'APIs & integrations',
-    color: 'magenta',
-    items: [
-      { name: 'REST APIs', level: '[set]', use: '[How you use them.]' },
-      { name: 'Planview', level: '[set]', use: 'Source of project data for automated reporting.' },
-    ],
-  },
-  {
-    group: 'Tools & delivery',
+    group: 'Project delivery',
     color: 'orange',
     items: [
-      { name: 'Git', level: '[set]', use: '[How you use it.]' },
-      { name: 'Project delivery', level: '[set]', use: 'Planning, stakeholder management and getting work over the line.' },
+      { name: 'Planning & milestones', use: 'Schedules, milestones and dependencies across three AI-enabled revenue cycle initiatives.' },
+      { name: 'Risk & issue management', use: 'Risk and issue tracking, including for a payment system cloud migration with many downstream teams.' },
+      { name: 'Budget & forecasting', use: 'Tracked a $1.67M operating and $50K capital budget, with forecasts and change requests.' },
+      { name: 'Governance', use: 'Co-led monthly program governance meetings with executive stakeholders; applied PMI processes.' },
+      { name: 'Agile / Scrum', use: 'Iterative delivery with developers, business analysts and test analysts.' },
+    ],
+  },
+  {
+    group: 'Systems & analysis',
+    color: 'magenta',
+    items: [
+      { name: 'Requirements', use: 'Gathered and documented integration requirements with client executives, product owners and developers.' },
+      { name: 'Data mapping', use: 'ERP-to-tax-engine data mappings, workflow diagrams and validation findings.' },
+      { name: 'SIT & UAT', use: 'System integration and user acceptance testing, documenting and working defects to resolution.' },
+      { name: 'Technical documentation', use: 'Training materials, process documentation and technical write-ups for client and internal teams.' },
+    ],
+  },
+  {
+    group: 'Data & automation',
+    color: 'cyan',
+    items: [
+      { name: 'Python', level: 'working knowledge', use: 'Workflows for processing and validating ERP transaction data; legacy data migration scripts.' },
+      { name: 'Alteryx', use: 'Workflows for processing and validating ERP transaction data and other business data.' },
+      { name: 'Power BI', use: 'Reporting workflows that replaced manual project reporting.' },
+      { name: 'Tableau', use: 'Data visualization and dashboards.' },
+      { name: 'SQL', level: 'working knowledge', use: 'Querying data for analysis.' },
+    ],
+  },
+  {
+    group: 'AI & platforms',
+    color: 'yellow',
+    items: [
+      { name: 'LLMs & prompt engineering', use: 'Using large language models day to day, and writing prompts that get dependable results.' },
+      { name: 'Palantir Foundry', level: 'project-level exposure', use: 'Platform for the AI-enabled revenue cycle initiatives I coordinate.' },
+      { name: 'REST APIs & Postman', level: 'working knowledge', use: 'Developing and testing API requests between ERP systems and tax engines.' },
+      { name: 'Git & GitHub', level: 'working knowledge', use: 'Version control — including this site.' },
+    ],
+  },
+  {
+    group: 'Delivery tools',
+    color: 'orange',
+    items: [
+      { name: 'Microsoft Project & Smartsheet', use: 'Project plans, status, resources and forecasts.' },
+      { name: 'Jira & Azure DevOps', use: 'Tracking work, defects and delivery.' },
     ],
   },
 ];
 
 export const experience = [
   {
-    org: '[Organization]',
-    role: '[Role]',
-    dates: '[Start] — Present',
-    summary: '[One or two sentences on what you were responsible for.]',
-    highlights: ['[Selected accomplishment you can support.]', '[Another one.]'],
+    org: 'HCA Healthcare · Parallon',
+    role: 'Project Manager II',
+    dates: 'April 2026 — Present',
+    summary: 'Coordinate schedules, milestones, dependencies and risks across three AI-enabled revenue cycle initiatives built on Palantir Foundry.',
+    highlights: [
+      'Support the rollout of one initiative into production and across its operational user base, while advancing two others toward pilot and user acceptance testing.',
+      'Lead weekly core-team meetings with executive business owners, presenting status and aligning priorities across every phase of the product lifecycle.',
+      'Spearhead coordination with shared services — education, change management, communications and testing — following PMI processes.',
+    ],
   },
   {
-    org: '[Organization]',
-    role: '[Role]',
-    dates: '[Start] — [End]',
-    summary: '[One or two sentences on what you were responsible for.]',
-    highlights: ['[Selected accomplishment you can support.]'],
+    org: 'KPMG LLP',
+    role: 'Senior Associate, Indirect Tax Technology',
+    dates: 'September 2025 — March 2026',
+    summary: 'Worked across four enterprise client engagements implementing tax technology integrated with SAP.',
+    highlights: [
+      'Built and updated Python and Alteryx workflows for processing and validating ERP transaction data.',
+    ],
+    projects: ['integration'],
+  },
+  {
+    org: 'HCA Healthcare · Parallon',
+    role: 'Project Manager',
+    dates: 'September 2023 — September 2025',
+    summary: 'Coordinated planning and delivery for a program supporting five hospital revenue cycle applications, with a team of five developers, two business analysts and two test analysts.',
+    highlights: [
+      'Tracked a $1.67M operating budget and $50K capital budget; co-led monthly governance meetings with executive stakeholders.',
+      'Established communication channels that cut project discovery and planning time by about two weeks.',
+      'Identified unused capital funds and coordinated their reallocation to server-stack upgrades.',
+    ],
+    projects: ['reporting', 'cloud-migration'],
+  },
+  {
+    org: 'Ducharme, McMillen & Associates',
+    role: 'Consultant · Associate Consultant, Indirect Tax Technology',
+    dates: 'July 2021 — August 2023',
+    summary: 'Supported delivery and project management across roughly 8–10 enterprise tax technology implementations.',
+    highlights: [],
+    projects: ['integration', 'migration'],
   },
 ];
 
