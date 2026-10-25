@@ -1,6 +1,6 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=15';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=15';
-import * as content from './data.js?v=15';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=16';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=16';
+import * as content from './data.js?v=16';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -101,10 +101,8 @@ function pageHTML(pg) {
       const now = items.filter((x) => x.status === 'now');
       const books = items.filter((x) => x.status !== 'now' && !isPod(x));
       const pods = items.filter((x) => x.status !== 'now' && isPod(x));
-      const year = new Date().getFullYear();
-      const thisYear = items.filter((x) => String(x.date).startsWith(String(year)));
-      const nBooks = thisYear.filter((x) => !isPod(x)).length;
-      const nPods = thisYear.filter(isPod).length;
+      const nBooks = items.filter((x) => !isPod(x)).length;
+      const nPods = items.filter(isPod).length;
       const list = (arr, empty) => arr.length
         ? `<ol class="log">${arr.map((x) => `<li>${entryHTML(x, false)}</li>`).join('')}</ol>`
         : `<p class="body log-empty">${empty}</p>`;
@@ -112,7 +110,7 @@ function pageHTML(pg) {
         ${marker(pg)}
         <h1 id="pageTitle" tabindex="-1">Input log.</h1>
         <p class="body">What I'm reading and listening to — the inputs behind the work. Newest first, with the one thing that stuck.</p>
-        <p class="mono log-stats"><span>${nBooks} ${nBooks === 1 ? 'book' : 'books'}</span><span>${nPods} ${nPods === 1 ? 'podcast' : 'podcasts'}</span><span>in ${year}</span></p>
+        <p class="mono log-stats"><span>${nBooks} ${nBooks === 1 ? 'book' : 'books'}</span><span>${nPods} ${nPods === 1 ? 'podcast' : 'podcasts'}</span></p>
         ${now.length ? `
         <section class="log-now" aria-label="On right now">
           <p class="mono on-air"><span class="on-dot" aria-hidden="true"></span>On right now</p>
@@ -201,19 +199,17 @@ function allListening() {
 
 const TYPE_LABEL = { book: 'Book', audiobook: 'Audiobook', podcast: 'Podcast' };
 const TYPE_COLOR = { book: 'yellow', audiobook: 'orange', podcast: 'magenta' };
+const coverCache = new Map();
 function spotifyEmbed(url) {
   const m = /^https:\/\/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(episode|show|audiobook|album|track|playlist)\/([A-Za-z0-9]+)/.exec(url || '');
   return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : '';
 }
-function monthLabel(d) {
-  const m = /^(\d{4})-(\d{2})/.exec(d || '');
-  return m ? new Date(+m[1], +m[2] - 1, 1).toLocaleString('en-US', { month: 'short', year: 'numeric' }) : esc(d || '');
-}
 // a generated cover tile when there's no cover image: type colour, initials and an icon
 function coverHTML(x) {
   // the generated tile sits underneath; a cover image covers it, and removes itself if it fails to load
-  const img = x.cover ? `<img class="cover-img" src="${esc(x.cover)}" alt="" loading="lazy" onerror="this.remove()">` : '';
-  return `<span class="cover-wrap">${tileHTML(x)}${img}</span>`;
+  const img = x.cover ? `<img class="cover-img" src="${esc(x.cover)}" alt="" decoding="async" onerror="this.remove()">` : '';
+  const lookup = !x.cover && /open\.spotify\.com\//.test(x.link || '') ? ` data-cover-from="${esc(x.link)}"` : '';
+  return `<span class="cover-wrap"${lookup}>${tileHTML(x)}${img}</span>`;
 }
 function tileHTML(x) {
   const initials = String(x.title).replace(/\[|\]/g, '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '··';
@@ -231,7 +227,7 @@ function entryHTML(x, big) {
     <article class="entry${big ? ' big' : ''}" style="--c:${COLORS[TYPE_COLOR[x.type] || 'cyan']}">
       ${coverHTML(x)}
       <div class="entry-body">
-        <p class="mono entry-meta"><span class="type">${TYPE_LABEL[x.type] || 'Item'}</span>${monthLabel(x.date)}${x.source === 'spotify' ? '<span class="via">via Spotify</span>' : ''}</p>
+        <p class="mono entry-meta"><span class="type">${TYPE_LABEL[x.type] || 'Item'}</span>${x.source === 'spotify' ? '<span class="via">via Spotify</span>' : ''}</p>
         <h3>${ph(x.title)}</h3>
         <p class="entry-by">${ph(x.by)}</p>
         ${x.takeaway ? `<p class="takeaway">${ph(x.takeaway)}</p>` : ''}
@@ -429,6 +425,26 @@ function wirePage() {
     const el = $('#' + b.dataset.jump, body);
     if (el) el.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
   }));
+  // entries with a Spotify link but no cover: ask Spotify's public oEmbed for the artwork
+  $$('[data-cover-from]', body).forEach(async (wrap) => {
+    const url = wrap.dataset.coverFrom;
+    try {
+      let thumb = coverCache.get(url);
+      if (!thumb) {
+        const r = await fetch('https://open.spotify.com/oembed?url=' + encodeURIComponent(url));
+        if (!r.ok) return;
+        thumb = (await r.json()).thumbnail_url;
+        if (!thumb) return;
+        coverCache.set(url, thumb);
+      }
+      const img = document.createElement('img');
+      img.className = 'cover-img';
+      img.alt = '';
+      img.src = thumb;
+      img.onerror = () => img.remove();
+      wrap.appendChild(img);
+    } catch (_) { /* offline or blocked: keep the generated tile */ }
+  });
   // Spotify players load only when asked for (no third-party requests until then)
   $$('[data-embed]', body).forEach((b) => b.addEventListener('click', () => {
     const f = document.createElement('iframe');

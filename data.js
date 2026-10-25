@@ -142,16 +142,16 @@ export const experience = [
 // Fields
 //   type:     'book' | 'audiobook' | 'podcast'
 //   status:   'now' for what you're on right now, otherwise 'done'
-//   date:     'YYYY-MM'
+//   date:     'YYYY-MM' (only used for ordering; not shown)
 //   link:     a Spotify link shows a play button; any other link shows "Details ↗"
 //   cover:    optional image URL ('' gives a generated cover tile)
 //   takeaway: one line on what stuck with you
 export const listening = [
   // Audiobooks from the Waldrops Portfolio playlist (Spotify lists these as shows)
-  { type: 'audiobook', status: 'done', title: 'The Hype Machine', by: 'Sinan Aral', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/1v9GAJzWb6d0fuHlXO2dHQ', cover: '' },
-  { type: 'audiobook', status: 'done', title: 'Nexus', by: 'Yuval Noah Harari', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/0WLodsHwFezxzYSaiC7aG1', cover: '' },
-  { type: 'audiobook', status: 'done', title: 'The Challenger Sale', by: 'Matthew Dixon, Brent Adamson', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/6ohFCPBRvNIIpQf9LXc3y4', cover: '' },
-  { type: 'audiobook', status: 'done', title: "It Doesn't Have to Be Crazy at Work", by: 'Jason Fried, David Heinemeier Hansson', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/5V3d6FXxmPtWT82BkbH2Xn', cover: '' },
+  { type: 'audiobook', status: 'done', title: 'The Hype Machine', by: 'Sinan Aral', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/1v9GAJzWb6d0fuHlXO2dHQ', cover: 'https://image-cdn-ak.spotifycdn.com/image/ab6766630000db5bf184d342ecaf72f8b8e6539b' },
+  { type: 'audiobook', status: 'done', title: 'Nexus', by: 'Yuval Noah Harari', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/0WLodsHwFezxzYSaiC7aG1', cover: 'https://image-cdn-fa.spotifycdn.com/image/ab6766630000db5b6eaa914d6b56e75792cec434' },
+  { type: 'audiobook', status: 'done', title: 'The Challenger Sale', by: 'Matthew Dixon, Brent Adamson', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/6ohFCPBRvNIIpQf9LXc3y4', cover: 'https://image-cdn-fa.spotifycdn.com/image/ab6766630000db5b5fd02c602fb348c5e0b6823c' },
+  { type: 'audiobook', status: 'done', title: "It Doesn't Have to Be Crazy at Work", by: 'Jason Fried, David Heinemeier Hansson', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/5V3d6FXxmPtWT82BkbH2Xn', cover: 'https://image-cdn-ak.spotifycdn.com/image/ab6766630000db5bb561ae33029d888b09881a9c' },
   // A print book:
   // { type: 'book', status: 'done', title: 'Book title', by: 'Author', date: '2026-10', takeaway: 'What stuck.', link: '', cover: '' },
   // A note on a synced podcast episode:
