@@ -128,19 +128,60 @@ def playlist_items(pid, token):
     """Playlist contents. Spotify renamed /tracks to /items in 2026; try both."""
     for suffix in ("items", "tracks"):
         try:
-            return paged(f"/playlists/{pid}/{suffix}?additional_types=episode", token, limit=300)
+            return paged(f"/playlists/{pid}/{suffix}?additional_types=episode,chapter", token, limit=300)
         except urllib.error.HTTPError as e:
             if e.code != 404 or suffix == "tracks":
                 raise
     return []
 
 
+def looks_like_book(ep):
+    """Audiobook chapters can come back looking like episodes; these are the tells."""
+    show = ep.get("show") or {}
+    return bool(
+        ep.get("type") in ("chapter", "audiobook")
+        or ep.get("audiobook")
+        or show.get("type") == "audiobook"
+        or show.get("authors") or show.get("narrators")
+        or ep.get("authors") or ep.get("narrators")
+    )
+
+
+def book_entry(ep, added_at, today):
+    book = ep.get("audiobook") or (ep.get("show") if (ep.get("show") or {}).get("type") == "audiobook" else None) or {}
+    authors = ", ".join(a.get("name", "") for a in (book.get("authors") or ep.get("authors") or (ep.get("show") or {}).get("authors") or []) if a.get("name"))
+    # one entry per book, however many of its chapters are in the playlist
+    if book.get("id"):
+        key = f"spotify:audiobook:{book['id']}"
+    elif (ep.get("show") or {}).get("id"):
+        key = f"spotify:book-show:{ep['show']['id']}"
+    else:
+        key = f"spotify:{'chapter' if ep.get('type') == 'chapter' else 'episode'}:{ep['id']}"
+    book_link = (book.get("external_urls") or {}).get("spotify")
+    return {
+        "id": key,
+        "type": "audiobook",
+        "status": "done",
+        "title": book.get("name") or ep.get("name") or "",
+        "by": authors or (ep.get("show") or {}).get("name") or "",
+        "date": month(added_at) or today,
+        "link": book_link or (ep.get("external_urls") or {}).get("spotify") or "",
+        "cover": pick_image(book.get("images") or ep.get("images") or (ep.get("show") or {}).get("images")),
+        "source": "spotify",
+    }
+
+
 def from_playlist(items, today):
     out = []
     for it in items:
         ep = it.get("item") or it.get("track") or {}
-        if ep.get("type") != "episode" or not ep.get("id"):
+        if not ep.get("id") or ep.get("type") == "track":
             continue  # songs in the playlist are ignored
+        if looks_like_book(ep):
+            out.append(book_entry(ep, it.get("added_at"), today))
+            continue
+        if ep.get("type") != "episode":
+            continue
         rp = ep.get("resume_point") or {}
         partway = not rp.get("fully_played") and (rp.get("resume_position_ms") or 0) > 0
         out.append(episode_entry(ep, it.get("added_at"), today, "now" if partway else "done"))
