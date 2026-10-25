@@ -1,0 +1,43 @@
+name: Update listening log
+
+on:
+  schedule:
+    - cron: '17 11 * * *'   # daily, around 6am Central
+  workflow_dispatch:         # adds a "Run workflow" button in the Actions tab
+
+permissions:
+  contents: write            # commit listening.json
+  pages: write               # ask GitHub Pages to rebuild
+
+concurrency:
+  group: listening-log
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch from Spotify
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+        run: python3 scripts/fetch_spotify.py
+
+      - name: Commit if anything changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- listening.json; then
+            echo "No new listening."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add listening.json
+          git commit -m "Update listening log"
+          git push
+          # make sure the site republishes with the new file
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" || true
