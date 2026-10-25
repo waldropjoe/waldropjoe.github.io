@@ -1,5 +1,6 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=13';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=13';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=14';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=14';
+import * as content from './data.js?v=14';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -172,10 +173,26 @@ function allListening() {
     return n ? { ...x, ...filled(n) } : x;
   });
   const leftover = [...notes.values()].filter((x) => x.title);   // notes for items not synced yet
-  return [...synced, ...leftover, ...manual]
+  // shows listed in data.js bookShows are books, even if Spotify called them episodes
+  // (read defensively, so an older data.js without bookShows still works)
+  const isBookShow = new Set((content.bookShows || []).map((n) => String(n).trim().toLowerCase()));
+  const typed = (x) => (x.type === 'podcast' && isBookShow.has(String(x.by || '').trim().toLowerCase())
+    ? { ...x, type: 'audiobook', title: x.by, by: '' }   // the show is the book; its episodes are chapters
+    : x);
+  // one entry per book: chapters of the same book collapse into the newest one
+  const seen = new Set();
+  const once = (x) => {
+    if (x.type === 'podcast') return true;
+    const k = (x.title + '|' + (x.by || '')).toLowerCase();
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  };
+  return [...synced, ...leftover, ...manual].map(typed)
     // placeholder entries like '[Book title]' stay out of the live log
     .filter((x) => !x.hide && x.title && !/^\s*\[.*\]\s*$/.test(x.title))
-    .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))
+    .filter(once);
 }
 
 const TYPE_LABEL = { book: 'Book', audiobook: 'Audiobook', podcast: 'Podcast' };

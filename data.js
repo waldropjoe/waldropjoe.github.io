@@ -153,6 +153,12 @@ export const listening = [
   // { link: 'https://open.spotify.com/episode/XXXXXXXX', takeaway: 'The one thing that stuck.' },
 ];
 
+// Spotify sometimes serves books as if they were podcast episodes. Put the show name
+// (as it appears under the title on the site) here and those items move to Books.
+export const bookShows = [
+  // 'The Psychology of Money',
+];
+
 export const contact = {
   title: 'Have an interesting problem to solve?',
   body: 'I’m always interested in connecting with people building useful things at the intersection of technology, data, and product.',
