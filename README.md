@@ -27,8 +27,8 @@ A Spotify link (episode, show or audiobook) gives the entry a "Play on Spotify" 
 
 ## Spotify sync (automatic podcasts and audiobooks)
 
-A GitHub Action (`.github/workflows/update-listening.yml`) runs daily, reads your **saved** Spotify
-episodes and audiobooks, and writes them to `listening.json`, which the Input Log merges with `data.js`.
+A GitHub Action (`.github/workflows/update-listening.yml`) runs daily, reads your Spotify
+podcast episodes and saved audiobooks, and writes them to `listening.json`, which the Input Log merges with `data.js`.
 
 - Episodes you've finished show as done; episodes you're partway through show under "On right now";
   saved-but-unplayed episodes are skipped.
@@ -42,3 +42,10 @@ One-time setup:
 3. In this repo: Settings → Secrets and variables → Actions → add `SPOTIFY_CLIENT_ID`,
    `SPOTIFY_CLIENT_SECRET` and `SPOTIFY_REFRESH_TOKEN`.
 4. Actions tab → "Update listening log" → Run workflow.
+
+### Curating podcasts with a playlist
+
+Set a repository **variable** `SPOTIFY_PLAYLIST_ID` (Settings → Secrets and variables → Actions →
+Variables) to your curation playlist's link or ID. Then only episodes in that playlist appear on the
+site: add an episode to publish it, remove it to unpublish it. Without the variable, saved episodes
+you've started or finished are used instead.

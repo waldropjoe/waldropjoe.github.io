@@ -1,5 +1,5 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=11';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=11';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=12';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=12';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -96,28 +96,39 @@ function pageHTML(pg) {
 
     case 'listening': {
       const items = allListening();
+      const isPod = (x) => x.type === 'podcast';
       const now = items.filter((x) => x.status === 'now');
-      const done = items.filter((x) => x.status !== 'now');
+      const books = items.filter((x) => x.status !== 'now' && !isPod(x));
+      const pods = items.filter((x) => x.status !== 'now' && isPod(x));
       const year = new Date().getFullYear();
       const thisYear = items.filter((x) => String(x.date).startsWith(String(year)));
-      const count = (t) => thisYear.filter((x) => (t === 'book' ? x.type !== 'podcast' : x.type === 'podcast')).length;
+      const nBooks = thisYear.filter((x) => !isPod(x)).length;
+      const nPods = thisYear.filter(isPod).length;
+      const list = (arr, empty) => arr.length
+        ? `<ol class="log">${arr.map((x) => `<li>${entryHTML(x, false)}</li>`).join('')}</ol>`
+        : `<p class="body log-empty">${empty}</p>`;
       return `
         ${marker(pg)}
         <h1 id="pageTitle" tabindex="-1">Input log.</h1>
         <p class="body">What I'm reading and listening to — the inputs behind the work. Newest first, with the one thing that stuck.</p>
-        <p class="mono log-stats"><span>${count('book')} books</span><span>${count('podcast')} podcasts</span><span>in ${year}</span></p>
+        <p class="mono log-stats"><span>${nBooks} ${nBooks === 1 ? 'book' : 'books'}</span><span>${nPods} ${nPods === 1 ? 'podcast' : 'podcasts'}</span><span>in ${year}</span></p>
         ${now.length ? `
         <section class="log-now" aria-label="On right now">
           <p class="mono on-air"><span class="on-dot" aria-hidden="true"></span>On right now</p>
           ${now.map((x) => entryHTML(x, true)).join('')}
         </section>` : ''}
-        <div class="log-filters" role="group" aria-label="Filter the log">
-          <button type="button" class="chip-btn" data-filter="all" aria-pressed="true">All</button>
-          <button type="button" class="chip-btn" data-filter="book" aria-pressed="false">Books</button>
-          <button type="button" class="chip-btn" data-filter="podcast" aria-pressed="false">Podcasts</button>
-        </div>
-        ${items.length ? '' : '<p class="body">Nothing logged yet.</p>'}
-        <ol class="log">${done.map((x) => `<li data-kind="${x.type === 'podcast' ? 'podcast' : 'book'}">${entryHTML(x, false)}</li>`).join('')}</ol>`;
+        <nav class="log-jump" aria-label="Jump to a section">
+          <button type="button" class="chip-btn" data-jump="log-books">Books <span>${books.length}</span></button>
+          <button type="button" class="chip-btn" data-jump="log-pods">Podcasts <span>${pods.length}</span></button>
+        </nav>
+        <section class="log-section" id="log-books" aria-labelledby="log-books-h">
+          <h2 class="log-h" id="log-books-h"><span class="log-h-icon book" aria-hidden="true"></span>Books</h2>
+          ${list(books, 'No books logged yet.')}
+        </section>
+        <section class="log-section" id="log-pods" aria-labelledby="log-pods-h">
+          <h2 class="log-h" id="log-pods-h"><span class="log-h-icon pod" aria-hidden="true"></span>Podcasts</h2>
+          ${list(pods, 'No podcasts logged yet.')}
+        </section>`;
     }
 
     case 'contact': {
@@ -199,7 +210,7 @@ function entryHTML(x, big) {
       ${coverHTML(x)}
       <div class="entry-body">
         <p class="mono entry-meta"><span class="type">${TYPE_LABEL[x.type] || 'Item'}</span>${monthLabel(x.date)}${x.source === 'spotify' ? '<span class="via">via Spotify</span>' : ''}</p>
-        <h2>${ph(x.title)}</h2>
+        <h3>${ph(x.title)}</h3>
         <p class="entry-by">${ph(x.by)}</p>
         ${x.takeaway ? `<p class="takeaway">${ph(x.takeaway)}</p>` : ''}
         ${action ? `<p class="entry-act">${action}</p>` : ''}
@@ -391,11 +402,10 @@ function route() {
 }
 
 function wirePage() {
-  // Input Log filters
-  $$('[data-filter]', body).forEach((b) => b.addEventListener('click', () => {
-    const f = b.dataset.filter;
-    $$('[data-filter]', body).forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
-    $$('.log > li', body).forEach((li) => { li.hidden = f !== 'all' && li.dataset.kind !== f; });
+  // Input Log: jump to Books / Podcasts (scrolls inside the page panel; no URL change)
+  $$('[data-jump]', body).forEach((b) => b.addEventListener('click', () => {
+    const el = $('#' + b.dataset.jump, body);
+    if (el) el.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
   }));
   // Spotify players load only when asked for (no third-party requests until then)
   $$('[data-embed]', body).forEach((b) => b.addEventListener('click', () => {

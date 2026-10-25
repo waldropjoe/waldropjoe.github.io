@@ -330,7 +330,14 @@ body.page-open .hero { opacity: 0; visibility: hidden; transition: opacity .3s e
 .on-air { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; color: var(--magenta); font-size: 11px; }
 .on-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--magenta); box-shadow: 0 0 10px var(--magenta); animation: blink 1.6s ease-in-out infinite; }
 .log-now .entry + .entry { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
-.log-filters { display: flex; gap: 8px; margin: 0 0 8px; }
+.log-jump { display: flex; gap: 8px; margin: 0 0 6px; }
+.chip-btn span { margin-left: 6px; color: var(--muted); }
+.log-section { margin-top: 30px; scroll-margin-top: 16px; }
+.page .log-h { display: flex; align-items: center; gap: 10px; margin: 0; padding-bottom: 10px; border-bottom: 1px solid var(--border); font-size: 22px; }
+.log-h-icon { width: 10px; height: 10px; border-radius: 2px; }
+.log-h-icon.book { background: var(--yellow); box-shadow: 0 0 10px var(--yellow); }
+.log-h-icon.pod { background: var(--magenta); box-shadow: 0 0 10px var(--magenta); }
+.log-empty { margin-top: 14px; }
 .chip-btn { min-height: 36px; padding: 0 14px; border: 1px solid var(--line); background: none; color: var(--muted); font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
 .chip-btn[aria-pressed="true"] { border-color: var(--cyan); color: var(--text); background: rgba(49, 234, 242, .08); }
 .log { list-style: none; margin: 0; padding: 0; }
@@ -348,8 +355,8 @@ body.page-open .hero { opacity: 0; visibility: hidden; transition: opacity .3s e
 .entry-meta { display: flex; gap: 10px; align-items: center; margin: 0 0 4px; color: var(--faint); font-size: 10px; }
 .entry-meta .type { color: var(--c); }
 .entry-meta .via { color: #1ED760; }
-.page .entry h2 { font-size: 18px; line-height: 1.25; }
-.entry.big h2 { font-size: 22px; }
+.page .entry h3 { font-size: 18px; line-height: 1.25; margin: 0; }
+.entry.big h3 { font-size: 22px; }
 .entry-by { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
 .takeaway { margin: 8px 0 0; padding-left: 12px; border-left: 2px solid var(--c); color: var(--text); font-size: 15px; }
 .entry-act { margin: 10px 0 0; }
