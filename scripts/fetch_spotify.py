@@ -128,7 +128,7 @@ def playlist_items(pid, token):
     """Playlist contents. Spotify renamed /tracks to /items in 2026; try both."""
     for suffix in ("items", "tracks"):
         try:
-            return paged(f"/playlists/{pid}/{suffix}?additional_types=episode,chapter", token, limit=300)
+            return paged(f"/playlists/{pid}/{suffix}?additional_types=track,episode,audiobook,chapter", token, limit=300)
         except urllib.error.HTTPError as e:
             if e.code != 404 or suffix == "tracks":
                 raise
@@ -173,18 +173,36 @@ def book_entry(ep, added_at, today):
 
 def from_playlist(items, today):
     out = []
+    skipped = []
     for it in items:
         ep = it.get("item") or it.get("track") or {}
-        if not ep.get("id") or ep.get("type") == "track":
+        if not ep.get("id"):
+            skipped.append("(no details returned)")
+            continue
+        if ep.get("type") == "track":
             continue  # songs in the playlist are ignored
+        if ep.get("type") in ("audiobook", "show") and (ep.get("authors") or ep.get("type") == "audiobook"):
+            # a whole audiobook in the playlist
+            authors = ", ".join(a.get("name", "") for a in (ep.get("authors") or []) if a.get("name"))
+            out.append({
+                "id": f"spotify:{ep['type']}:{ep['id']}", "type": "audiobook", "status": "done",
+                "title": ep.get("name") or "", "by": authors, "date": month(it.get("added_at")) or today,
+                "link": (ep.get("external_urls") or {}).get("spotify") or "", "cover": pick_image(ep.get("images")),
+                "source": "spotify",
+            })
+            continue
         if looks_like_book(ep):
             out.append(book_entry(ep, it.get("added_at"), today))
             continue
         if ep.get("type") != "episode":
+            skipped.append(ep.get("type") or "unknown")
             continue
         rp = ep.get("resume_point") or {}
         partway = not rp.get("fully_played") and (rp.get("resume_position_ms") or 0) > 0
         out.append(episode_entry(ep, it.get("added_at"), today, "now" if partway else "done"))
+    if skipped:
+        print(f"note: skipped {len(skipped)} playlist item(s) Spotify didn't describe fully: {', '.join(skipped)}. "
+              "Add those to data.js by hand (audiobooks usually).")
     return out
 
 
