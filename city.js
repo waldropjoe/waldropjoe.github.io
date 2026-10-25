@@ -23,6 +23,7 @@ export const LANDMARKS = [
   { id: 'data-tower', name: 'Data Tower', sub: 'Work · Automated reporting', target: '#/work/reporting', x: -28, y: 14, w: 6.2, d: 6.2, h: 34, color: 'cyan', roof: 'spire', spot: [-21, 14] },
   { id: 'relay', name: 'Relay Station', sub: 'Work · Integrations', target: '#/work/integration', x: 28, y: -28, w: 6.4, d: 5.4, h: 21, color: 'magenta', roof: 'antenna', spot: [21, -28] },
   { id: 'lab', name: 'Ideas Lab', sub: 'Work · Experiments', target: '#/work/ideas', x: 28, y: 14, w: 6.4, d: 6.4, h: 11, color: 'yellow', roof: 'step', spot: [21, 14] },
+  { id: 'switchboard', name: 'The Switchboard', sub: 'Work · AI issue triage', target: '#/work/issue-log', x: 28, y: 28, w: 6, d: 6, h: 18, color: 'violet', roof: 'antenna', spot: [21, 28], keepLayout: true },
   { id: 'hq', name: 'Waldrop HQ', sub: 'About', target: '#/about', x: -38.5, y: -38.5, w: 11, d: 11, h: 10, color: 'violet', roof: 'sign', spot: [-21, -38.5] },
   { id: 'listening', name: 'Listening Post', sub: 'Books & podcasts', target: '#/listening', x: -28, y: 28, w: 6, d: 6, h: 9, color: 'magenta', roof: 'mast', spot: [-21, 28] },
   { id: 'stack', name: 'The Stack', sub: 'Skills', target: '#/skills', x: 14, y: -28, w: 5.4, d: 5.4, h: 28, color: 'yellow', roof: 'spire', spot: [14, -21] },
@@ -134,8 +135,12 @@ function buildWorld(lite) {
       const lm = landmarkAt.get(`${cx},${cy}`);
       if (lm) {
         buildings.push({ ...lm, landmark: lm.id, z: 0, units: [], band: accent[lm.color], warm: true, seed: seed++, phase: 0 });
-        continue;
+        if (!lm.keepLayout) continue;
       }
+      // a landmark added later sits on a lot that used to be generated: still roll that lot's dice
+      // (into a scratch list) so every other building in the city stays exactly where it was
+      const nb = buildings.length, nc = comps.length, seed0 = seed;
+      try {
       const ring = 1 - Math.min(1, Math.hypot(cx, cy) / 62);                      // taller toward the middle
       if (R() < (lite ? 0.2 : 0.08)) {
         // a small plaza: chip components sit here instead of a building
@@ -158,6 +163,9 @@ function buildWorld(lite) {
       const nearSign = cx < -14 && cy < -14;
       if (nearSign) h = Math.min(h, 7);
       buildings.push(makeBuilding(cx + (R() - 0.5) * (6.4 - w), cy + (R() - 0.5) * (6.4 - d), w, d, h, nearSign));
+      } finally {
+        if (lm) { buildings.length = nb; comps.length = nc; seed = seed0; }
+      }
     }
   }
   // components ringing the die, like the parts around a real chip package

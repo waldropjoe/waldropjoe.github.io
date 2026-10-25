@@ -1,6 +1,6 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=18';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=18';
-import * as content from './data.js?v=18';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=19';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=19';
+import * as content from './data.js?v=19';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
