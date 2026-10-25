@@ -14,13 +14,14 @@ Your Spotify app must list this exact Redirect URI:
 Access requested (read-only):
     user-library-read           your saved episodes and audiobooks
     user-read-playback-position how far you got through each episode
+    playlist-read-private       read your curation playlist, even if it's private
 Nothing here can change your account, play music or see your password.
 """
 import base64
+import os
 import getpass
 import http.server
 import json
-import secrets
 import sys
 import threading
 import urllib.error
@@ -29,7 +30,7 @@ import urllib.request
 import webbrowser
 
 REDIRECT = "http://127.0.0.1:8888/callback"
-SCOPES = "user-library-read user-read-playback-position"
+SCOPES = "user-library-read user-read-playback-position playlist-read-private"
 
 result = {}
 
@@ -60,7 +61,8 @@ def main():
     if not cid or not secret:
         sys.exit("Both the Client ID and Client Secret are needed.")
 
-    state = secrets.token_urlsafe(16)
+    # random state value (os.urandom avoids clashing with any local file named secrets.py)
+    state = base64.urlsafe_b64encode(os.urandom(16)).decode().rstrip('=')
     result["expected_state"] = state
     url = "https://accounts.spotify.com/authorize?" + urllib.parse.urlencode({
         "client_id": cid,
