@@ -6,7 +6,10 @@ Runs daily in GitHub Actions (.github/workflows/update-listening.yml).
 Standard library only — nothing to install.
 
 What it collects
-  • Saved podcast episodes ("Your Episodes") that you've started or finished.
+  • CURATED MODE (recommended): set SPOTIFY_PLAYLIST_ID and only the podcast episodes in
+    that playlist are shown. Add an episode to the playlist to publish it; remove it to
+    unpublish it. In this mode saved episodes are ignored.
+  • Otherwise: saved podcast episodes ("Your Episodes") that you've started or finished.
       finished          -> status 'done'
       partway through   -> status 'now'
       saved, not played -> skipped (that's a to-listen queue, not listening)
@@ -18,6 +21,7 @@ after you un-save something. If Spotify errors, the existing file is left as is.
 
 Environment (set as GitHub repository secrets):
   SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REFRESH_TOKEN
+Optional (a repository variable): SPOTIFY_PLAYLIST_ID — the curation playlist
 """
 import base64
 import datetime as dt
@@ -90,17 +94,54 @@ def from_episodes(saved, today):
             status = "now"
         else:
             continue  # saved but not started: skip
-        out.append({
-            "id": f"spotify:episode:{ep['id']}",
-            "type": "podcast",
-            "status": status,
-            "title": ep.get("name") or "",
-            "by": (ep.get("show") or {}).get("name") or "",
-            "date": month(item.get("added_at")) or today,
-            "link": (ep.get("external_urls") or {}).get("spotify") or f"https://open.spotify.com/episode/{ep['id']}",
-            "cover": pick_image(ep.get("images") or (ep.get("show") or {}).get("images")),
-            "source": "spotify",
-        })
+        out.append(episode_entry(ep, item.get("added_at"), today, status))
+    return out
+
+
+def episode_entry(ep, added_at, today, status):
+    return {
+        "id": f"spotify:episode:{ep['id']}",
+        "type": "podcast",
+        "status": status,
+        "title": ep.get("name") or "",
+        "by": (ep.get("show") or {}).get("name") or "",
+        "date": month(added_at) or today,
+        "link": (ep.get("external_urls") or {}).get("spotify") or f"https://open.spotify.com/episode/{ep['id']}",
+        "cover": pick_image(ep.get("images") or (ep.get("show") or {}).get("images")),
+        "source": "spotify",
+    }
+
+
+def playlist_id(value):
+    """Accept a bare ID, a spotify:playlist: URI or an open.spotify.com link."""
+    v = (value or "").strip()
+    if "playlist/" in v:
+        v = v.split("playlist/")[1]
+    if v.startswith("spotify:playlist:"):
+        v = v.split(":")[-1]
+    return v.split("?")[0].strip("/")
+
+
+def playlist_items(pid, token):
+    """Playlist contents. Spotify renamed /tracks to /items in 2026; try both."""
+    for suffix in ("items", "tracks"):
+        try:
+            return paged(f"/playlists/{pid}/{suffix}?additional_types=episode", token, limit=300)
+        except urllib.error.HTTPError as e:
+            if e.code != 404 or suffix == "tracks":
+                raise
+    return []
+
+
+def from_playlist(items, today):
+    out = []
+    for it in items:
+        ep = it.get("item") or it.get("track") or {}
+        if ep.get("type") != "episode" or not ep.get("id"):
+            continue  # songs in the playlist are ignored
+        rp = ep.get("resume_point") or {}
+        partway = not rp.get("fully_played") and (rp.get("resume_position_ms") or 0) > 0
+        out.append(episode_entry(ep, it.get("added_at"), today, "now" if partway else "done"))
     return out
 
 
@@ -155,10 +196,21 @@ def main():
         sys.exit(1)
 
     fresh = []
-    for label, path, convert in (
-        ("episodes", "/me/episodes", from_episodes),
-        ("audiobooks", "/me/audiobooks", from_audiobooks),
-    ):
+    pid = playlist_id(os.environ.get("SPOTIFY_PLAYLIST_ID"))
+    curated = None
+    if pid:
+        # curated mode: the playlist decides which podcast episodes appear
+        try:
+            curated = from_playlist(playlist_items(pid, token), today)
+            print(f"playlist episodes: {len(curated)}")
+            fresh.extend(curated)
+        except urllib.error.HTTPError as e:
+            print(f"warning: playlist unavailable ({e.code}). If it's private, make it public "
+                  "or rerun spotify_login.py (it now asks for playlist access).", file=sys.stderr)
+    sources = [("audiobooks", "/me/audiobooks", from_audiobooks)]
+    if not pid:
+        sources.insert(0, ("episodes", "/me/episodes", from_episodes))
+    for label, path, convert in sources:
         try:
             items = convert(paged(path, token), today)
             print(f"{label}: {len(items)}")
@@ -167,6 +219,10 @@ def main():
             # one section failing shouldn't wipe the log; keep going with the rest
             print(f"warning: {label} unavailable ({e.code}); keeping previous entries", file=sys.stderr)
 
+    if curated is not None:
+        # the playlist is the source of truth for podcasts: drop synced episodes no longer in it
+        keep = {e["id"] for e in curated}
+        existing = [e for e in existing if not (e.get("type") == "podcast" and e.get("source") == "spotify" and e.get("id") not in keep)]
     merged = merge(existing, fresh)
     text = json.dumps(merged, indent=2, ensure_ascii=False) + "\n"
     with open(OUT, "w", encoding="utf-8") as f:
