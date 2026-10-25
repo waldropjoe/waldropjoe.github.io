@@ -147,9 +147,14 @@ export const experience = [
 //   cover:    optional image URL ('' gives a generated cover tile)
 //   takeaway: one line on what stuck with you
 export const listening = [
-  { type: 'book', status: 'now', title: '[Book you are reading now]', by: '[Author]', date: '2026-10', takeaway: '[What has stuck with you so far.]', link: '', cover: '' },
-  { type: 'book', status: 'done', title: '[A book you finished]', by: '[Author]', date: '2026-09', takeaway: '[One-line takeaway.]', link: '', cover: '' },
-  // Example note on a synced podcast episode:
+  // Audiobooks from the Waldrops Portfolio playlist (Spotify lists these as shows)
+  { type: 'audiobook', status: 'done', title: 'The Hype Machine', by: 'Sinan Aral', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/1v9GAJzWb6d0fuHlXO2dHQ', cover: '' },
+  { type: 'audiobook', status: 'done', title: 'Nexus', by: 'Yuval Noah Harari', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/0WLodsHwFezxzYSaiC7aG1', cover: '' },
+  { type: 'audiobook', status: 'done', title: 'The Challenger Sale', by: 'Matthew Dixon, Brent Adamson', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/6ohFCPBRvNIIpQf9LXc3y4', cover: '' },
+  { type: 'audiobook', status: 'done', title: "It Doesn't Have to Be Crazy at Work", by: 'Jason Fried, David Heinemeier Hansson', date: '2026-10', takeaway: '', link: 'https://open.spotify.com/show/5V3d6FXxmPtWT82BkbH2Xn', cover: '' },
+  // A print book:
+  // { type: 'book', status: 'done', title: 'Book title', by: 'Author', date: '2026-10', takeaway: 'What stuck.', link: '', cover: '' },
+  // A note on a synced podcast episode:
   // { link: 'https://open.spotify.com/episode/XXXXXXXX', takeaway: 'The one thing that stuck.' },
 ];
 

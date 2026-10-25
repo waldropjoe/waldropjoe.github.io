@@ -1,6 +1,6 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=14';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=14';
-import * as content from './data.js?v=14';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=15';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=15';
+import * as content from './data.js?v=15';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -179,11 +179,15 @@ function allListening() {
   const typed = (x) => (x.type === 'podcast' && isBookShow.has(String(x.by || '').trim().toLowerCase())
     ? { ...x, type: 'audiobook', title: x.by, by: '' }   // the show is the book; its episodes are chapters
     : x);
-  // one entry per book: chapters of the same book collapse into the newest one
+  // one entry per book: chapters collapse together, and a book written in data.js
+  // wins over the same book synced from Spotify (matched on the title before any subtitle)
+  const bookKey = (x) => String(x.title || '').split(/[:|]/)[0].trim().toLowerCase();
+  const handWritten = new Set([...leftover, ...manual].filter((x) => x.type !== 'podcast').map(bookKey));
   const seen = new Set();
   const once = (x) => {
     if (x.type === 'podcast') return true;
-    const k = (x.title + '|' + (x.by || '')).toLowerCase();
+    const k = bookKey(x);
+    if (x.source === 'spotify' && handWritten.has(k)) return false;
     if (seen.has(k)) return false;
     seen.add(k);
     return true;
