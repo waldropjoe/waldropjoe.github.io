@@ -490,3 +490,6 @@ body.page-open .hero { opacity: 0; visibility: hidden; transition: opacity .3s e
 .m-proj { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 10px 0 0; font-size: 11px; color: var(--muted); }
 .m-proj a { color: var(--cyan); text-decoration: none; }
 .m-proj a:hover { text-decoration: underline; }
+
+/* header: just the brand and the Directory button */
+.nav .dir-btn { margin-left: auto; }

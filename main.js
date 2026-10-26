@@ -1,6 +1,6 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=19';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=19';
-import * as content from './data.js?v=19';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=22';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=22';
+import * as content from './data.js?v=22';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -17,15 +17,15 @@ const lmById = (id) => LANDMARKS.find((l) => l.id === id);
 // ---------- pages ----------
 // Each page lives at its own address (#/about, #/work …) and belongs to a building.
 const PAGES = [
-  { id: 'about', label: 'About', marker: '02', name: 'The Infrastructure', landmark: 'hq' },
-  { id: 'work', label: 'Work', marker: '03', name: 'The Buildings', landmark: 'data-tower' },
-  { id: 'skills', label: 'Skills', marker: '04', name: 'The Circuit Board', landmark: 'stack' },
-  { id: 'experience', label: 'Experience', marker: '05', name: 'The Control Center', landmark: 'control' },
-  { id: 'listening', label: 'Listening', marker: '06', name: 'The Listening Post', landmark: 'listening' },
-  { id: 'contact', label: 'Contact', marker: '07', name: 'The Launchpad', landmark: 'core' },
+  { id: 'about', label: 'About', marker: '02', name: 'About', nick: 'Waldrop HQ', landmark: 'hq' },
+  { id: 'work', label: 'Work', marker: '03', name: 'Work', nick: 'The Skyline', landmark: 'data-tower' },
+  { id: 'skills', label: 'Skills', marker: '04', name: 'Skills', nick: 'The Toolbox', landmark: 'stack' },
+  { id: 'experience', label: 'Experience', marker: '05', name: 'Experience', nick: 'Career Tower', landmark: 'control' },
+  { id: 'listening', label: 'Books & Podcasts', marker: '06', name: 'Books & Podcasts', nick: 'The Listening Post', landmark: 'listening' },
+  { id: 'contact', label: 'Contact', marker: '07', name: 'Contact', nick: 'The Front Door', landmark: 'core' },
 ];
 
-const marker = (pg) => `<p class="marker mono"><span class="marker-n">${pg.marker}</span><span class="marker-line" aria-hidden="true"></span>${pg.name}</p>`;
+const marker = (pg) => `<p class="marker mono"><span class="marker-n">${pg.marker}</span><span class="marker-line" aria-hidden="true"></span>${pg.nick}</p>`;
 
 function pageHTML(pg, sub) {
   switch (pg.id) {
@@ -52,7 +52,7 @@ function pageHTML(pg, sub) {
         return `
         <p class="mono crumb"><a href="#/work">← All work</a></p>
         <article class="project featured solo" style="--accent:${COLORS[lm ? lm.color : 'cyan']}">
-          <p class="mono p-meta"><span class="p-dot" aria-hidden="true"></span>${lm ? `${esc(lm.name)} · ` : ''}${ph(p.category)}</p>
+          <p class="mono p-meta"><span class="p-dot" aria-hidden="true"></span>${lm ? `${esc(lm.sub)} · ` : ''}${ph(p.category)}</p>
           <h1 id="pageTitle" tabindex="-1">${ph(p.name)}</h1>
           <p class="mono p-sub">${ph(p.role)} · ${ph(p.year)}</p>
           <dl class="p-grid">
@@ -67,13 +67,13 @@ function pageHTML(pg, sub) {
       // the index: one line per project
       return `
         ${marker(pg)}
-        <h1 id="pageTitle" tabindex="-1">Selected work.</h1>
-        <p class="body">Some projects have their own building in the city — drive there, or pick one here.</p>
+        <h1 id="pageTitle" tabindex="-1">The skyline: what I’ve built.</h1>
+        <p class="body">The projects with a building have their name on the map — drive over, or pick one here.</p>
         <ul class="work-index">
           ${projects.map((x) => {
             const lm = lmById(x.landmark);
             return `<li style="--accent:${COLORS[lm ? lm.color : 'cyan']}"><a href="#/work/${x.id}">
-              <span class="wi-main"><span class="mono wi-meta"><span class="p-dot" aria-hidden="true"></span>${lm ? esc(lm.name) : 'Project'} · ${ph(x.year)}</span><span class="wi-name">${ph(x.name)}</span><span class="wi-cat">${ph(x.category)}</span></span>
+              <span class="wi-main"><span class="mono wi-meta"><span class="p-dot" aria-hidden="true"></span>${x.landmark && lm ? esc(lm.sub) + ' · ' : ''}${ph(x.year)}</span><span class="wi-name">${ph(x.name)}</span><span class="wi-cat">${ph(x.category)}</span></span>
               <span class="mono wi-go" aria-hidden="true">Open →</span>
             </a></li>`;
           }).join('')}
@@ -83,8 +83,8 @@ function pageHTML(pg, sub) {
     case 'skills':
       return `
         ${marker(pg)}
-        <h1 id="pageTitle" tabindex="-1">The circuit board: what the city runs on.</h1>
-        <p class="body">Select a node to see how I use it.</p>
+        <h1 id="pageTitle" tabindex="-1">The toolbox: what I reach for.</h1>
+        <p class="body">Pick a tool to see how I actually use it.</p>
         <div class="board">
           ${skills.map((g, gi) => `
             <div class="bus" style="--bus:${COLORS[g.color]}">
@@ -99,7 +99,8 @@ function pageHTML(pg, sub) {
     case 'experience':
       return `
         ${marker(pg)}
-        <h1 id="pageTitle" tabindex="-1">The control center.</h1>
+        <h1 id="pageTitle" tabindex="-1">Career Tower, floor by floor.</h1>
+        <p class="body">Newest floor on top.</p>
         <ol class="timeline">
           ${experience.map((e) => `
             <li class="module">
@@ -125,7 +126,7 @@ function pageHTML(pg, sub) {
         : `<p class="body log-empty">${empty}</p>`;
       return `
         ${marker(pg)}
-        <h1 id="pageTitle" tabindex="-1">Input log.</h1>
+        <h1 id="pageTitle" tabindex="-1">The Listening Post: what’s coming in.</h1>
         <p class="body">What I'm reading and listening to — the inputs behind the work. Newest first, with the one thing that stuck.</p>
         <p class="mono log-stats"><span>${nBooks} ${nBooks === 1 ? 'book' : 'books'}</span><span>${nPods} ${nPods === 1 ? 'podcast' : 'podcasts'}</span></p>
         ${now.length ? `
@@ -254,14 +255,25 @@ function entryHTML(x, big) {
 }
 
 // next / previous building, so a visitor can tour the city page by page
-function pagerHTML(pg) {
+function pagerHTML(pg, project) {
+  if (project) {
+    const j = projects.indexOf(project);
+    const pp = projects[j - 1], np = projects[j + 1];
+    const after = PAGES[PAGES.indexOf(pg) + 1];
+    return `
+    <nav class="pager" aria-label="More projects">
+      ${pp ? `<a href="#/work/${pp.id}" class="mono"><span>← Project ${j}</span>${esc(pp.name)}</a>` : `<a href="#/work" class="mono"><span>←</span>All work</a>`}
+      ${np ? `<a href="#/work/${np.id}" class="mono next"><span>Project ${j + 2} →</span>${esc(np.name)}</a>` : `<a href="#/${after.id}" class="mono next"><span>${after.marker} →</span>${after.label}</a>`}
+    </nav>
+    <p class="mono foot">© ${new Date().getFullYear()} ${esc(person.name)} · hand-built city · no trackers</p>`;
+  }
   const i = PAGES.indexOf(pg);
   const prev = PAGES[i - 1];
   const next = PAGES[i + 1];
   return `
     <nav class="pager" aria-label="More pages">
-      ${prev ? `<a href="#/${prev.id}" class="mono"><span>← ${prev.marker}</span>${prev.name}</a>` : '<a href="#/" class="mono"><span>← 01</span>The City</a>'}
-      ${next ? `<a href="#/${next.id}" class="mono next"><span>${next.marker} →</span>${next.name}</a>` : '<a href="#/" class="mono next"><span>01 →</span>The City</a>'}
+      ${prev ? `<a href="#/${prev.id}" class="mono"><span>← ${prev.marker}</span>${prev.label}</a>` : '<a href="#/" class="mono"><span>← 01</span>The City</a>'}
+      ${next ? `<a href="#/${next.id}" class="mono next"><span>${next.marker} →</span>${next.label}</a>` : '<a href="#/" class="mono next"><span>01 →</span>The City</a>'}
     </nav>
     <p class="mono foot">© ${new Date().getFullYear()} ${esc(person.name)} · hand-built city · no trackers</p>`;
 }
@@ -283,7 +295,8 @@ function renderHome() {
     </div>
   </section>`;
 
-  $('#navLinks').innerHTML = PAGES.map((p) => `<a href="#/${p.id}" data-nav="${p.id}">${p.label}</a>`).join('');
+  // the header shows only the Directory button; the menu links were removed
+  if ($('#navLinks')) $('#navLinks').innerHTML = PAGES.map((p) => `<a href="#/${p.id}" data-nav="${p.id}">${p.label}</a>`).join('');
   $('#dirList').innerHTML = LANDMARKS.map((l) => `
     <li><a href="${l.target}" data-dir>
       <span class="d-dot" style="--dot:${COLORS[l.core ? 'cyan' : l.color]}"></span>
@@ -381,7 +394,7 @@ function route() {
       sheet.classList.remove('open');
       document.body.classList.remove('page-open');
       openTimer = setTimeout(() => { sheet.hidden = true; }, reduced.matches ? 0 : 450);
-      document.title = 'Joe Waldrop — Chip City';
+      document.title = 'Joe Waldrop — Waldropolis';
       if (returnFocus && document.contains(returnFocus)) returnFocus.focus({ preventScroll: true });
     }
     city && city.setFocus(null);
@@ -409,11 +422,13 @@ function route() {
 
   const show = () => {
     if (!same) {
-      body.innerHTML = `<div class="page page-${r.pg.id}">${pageHTML(r.pg, project ? project.id : null)}${pagerHTML(r.pg)}</div>`;
+      body.innerHTML = `<div class="page page-${r.pg.id}">${pageHTML(r.pg, project ? project.id : null)}${pagerHTML(r.pg, project)}</div>`;
       wirePage();
       body.scrollTop = 0;
     }
-    $('#sheetWhere').textContent = `${r.pg.marker} / ${String(PAGES.length + 1).padStart(2, '0')} · ${lm.name}`;
+    $('#sheetWhere').textContent = project
+      ? `Project ${projects.indexOf(project) + 1} / ${projects.length}${project.landmark ? ' · ' + lm.sub : ''}`
+      : `${r.pg.marker} / ${String(PAGES.length + 1).padStart(2, '0')} · ${r.pg.nick}`;
     sheet.hidden = false;
     void sheet.offsetWidth;
     sheet.classList.add('open');

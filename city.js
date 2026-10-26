@@ -20,15 +20,15 @@ export const COLORS = {
 
 // Landmarks are the buildings you can visit. `target` is the page anchor.
 export const LANDMARKS = [
-  { id: 'data-tower', name: 'Data Tower', sub: 'Work · Automated reporting', target: '#/work/reporting', x: -28, y: 14, w: 6.2, d: 6.2, h: 34, color: 'cyan', roof: 'spire', spot: [-21, 14] },
-  { id: 'relay', name: 'Relay Station', sub: 'Work · Integrations', target: '#/work/integration', x: 28, y: -28, w: 6.4, d: 5.4, h: 21, color: 'magenta', roof: 'antenna', spot: [21, -28] },
-  { id: 'lab', name: 'Ideas Lab', sub: 'Work · Experiments', target: '#/work/ideas', x: 28, y: 14, w: 6.4, d: 6.4, h: 11, color: 'yellow', roof: 'step', spot: [21, 14] },
-  { id: 'switchboard', name: 'The Switchboard', sub: 'Work · AI issue triage', target: '#/work/issue-log', x: 28, y: 28, w: 6, d: 6, h: 18, color: 'violet', roof: 'antenna', spot: [21, 28], keepLayout: true },
-  { id: 'hq', name: 'Waldrop HQ', sub: 'About', target: '#/about', x: -38.5, y: -38.5, w: 11, d: 11, h: 10, color: 'violet', roof: 'sign', spot: [-21, -38.5] },
-  { id: 'listening', name: 'Listening Post', sub: 'Books & podcasts', target: '#/listening', x: -28, y: 28, w: 6, d: 6, h: 9, color: 'magenta', roof: 'mast', spot: [-21, 28] },
-  { id: 'stack', name: 'The Stack', sub: 'Skills', target: '#/skills', x: 14, y: -28, w: 5.4, d: 5.4, h: 28, color: 'yellow', roof: 'spire', spot: [14, -21] },
-  { id: 'control', name: 'Control Center', sub: 'Experience', target: '#/experience', x: 0, y: 28, w: 6.4, d: 5.6, h: 15, color: 'orange', roof: 'antenna', spot: [0, 21] },
-  { id: 'core', name: 'Launchpad', sub: 'Contact', target: '#/contact', core: true, x: 0, y: 0, h: 1.6, spot: [0, -12.6] },
+  { id: 'data-tower', name: 'Reporting', sub: 'Dashboard Tower', target: '#/work/reporting', x: -28, y: 14, w: 6.2, d: 6.2, h: 34, color: 'cyan', roof: 'spire', spot: [-21, 14] },
+  { id: 'relay', name: 'Integrations', sub: 'API Exchange', target: '#/work/integration', x: 28, y: -28, w: 6.4, d: 5.4, h: 21, color: 'magenta', roof: 'antenna', spot: [21, -28] },
+  { id: 'lab', name: 'This Site', sub: 'The Workshop', target: '#/work/ideas', x: 28, y: 14, w: 6.4, d: 6.4, h: 11, color: 'yellow', roof: 'step', spot: [21, 14] },
+  { id: 'switchboard', name: 'Issue Log', sub: 'Bug Catcher', target: '#/work/issue-log', x: 28, y: 28, w: 6, d: 6, h: 18, color: 'violet', roof: 'antenna', spot: [21, 28], keepLayout: true },
+  { id: 'hq', name: 'About', sub: 'Waldrop HQ', target: '#/about', x: -38.5, y: -38.5, w: 11, d: 11, h: 10, color: 'violet', roof: 'sign', spot: [-21, -38.5] },
+  { id: 'listening', name: 'Books & Podcasts', sub: 'The Listening Post', target: '#/listening', x: -28, y: 28, w: 6, d: 6, h: 9, color: 'magenta', roof: 'mast', spot: [-21, 28] },
+  { id: 'stack', name: 'Skills', sub: 'The Toolbox', target: '#/skills', x: 14, y: -28, w: 5.4, d: 5.4, h: 28, color: 'yellow', roof: 'spire', spot: [14, -21] },
+  { id: 'control', name: 'Experience', sub: 'Career Tower', target: '#/experience', x: 0, y: 28, w: 6.4, d: 5.6, h: 15, color: 'orange', roof: 'antenna', spot: [0, 21] },
+  { id: 'core', name: 'Contact', sub: 'The Front Door', target: '#/contact', core: true, x: 0, y: 0, h: 1.6, spot: [0, -12.6] },
 ];
 
 // The road network: four avenues and four short spokes into the core.
@@ -870,11 +870,24 @@ export function createCity(canvas, { labelLayer, tooltip, onEnter, onNear = () =
     for (const it of items) it.core ? core() : it.car ? drawCar() : it.cp ? component(it.cp) : building(it.b);
     carMarker();
 
-    // labels follow their buildings
-    for (const lm of LANDMARKS) {
+    // labels follow their buildings; where two would overlap, the one further back moves up
+    const placed = [];
+    const spots = LANDMARKS.map((lm) => {
       const t = tags.get(lm.id);
       const top = lm.core ? 2.5 : lm.roof === 'mast' ? lm.h + MAST + 2.5 : lm.roof === 'sign' ? lm.h + SIGN.z1 + 2.5 : lm.roof === 'spire' ? lm.h * 1.16 + 2 : lm.roof === 'antenna' ? lm.h + 5.5 : lm.h + 2;
-      const p = proj(lm.x, lm.y, top);
+      if (!t._w) { t._w = t.offsetWidth; t._h = t.offsetHeight; }   // label text never changes: measure once
+      return { lm, t, p: proj(lm.x, lm.y, top), d: depth(lm.x, lm.y) };
+    }).sort((a, b) => b.d - a.d);                                       // nearest the viewer first
+    for (const { t, p } of spots) {
+      const w = t._w + 6, h = t._h + 4;
+      for (let guard = 0; guard < LANDMARKS.length; guard++) {
+        const hit = placed.find((q) => Math.abs(q.x - p[0]) < (q.w + w) / 2 && p[1] > q.y - q.h && p[1] - h < q.y);
+        if (!hit) break;
+        p[1] = hit.y - hit.h;                                            // sit just above the label it hit
+      }
+      placed.push({ x: p[0], y: p[1], w, h });
+    }
+    for (const { lm, t, p } of spots) {
       t.style.transform = `translate(${p[0].toFixed(1)}px, ${p[1].toFixed(1)}px) translate(-50%, -100%)`;
       // tags that would sit behind the text column are hidden (lmx = left edge of the clear area)
       const visible = cam.labels > 0.05 && p[0] > W * cam.lmx + 40 && p[0] < W - 20 && p[1] > 70 && p[1] < H - 10;
