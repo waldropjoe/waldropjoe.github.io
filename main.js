@@ -1,6 +1,6 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=22';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=22';
-import * as content from './data.js?v=22';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=25';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=25';
+import * as content from './data.js?v=25';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -17,13 +17,16 @@ const lmById = (id) => LANDMARKS.find((l) => l.id === id);
 // ---------- pages ----------
 // Each page lives at its own address (#/about, #/work …) and belongs to a building.
 const PAGES = [
-  { id: 'about', label: 'About', marker: '02', name: 'About', nick: 'Waldrop HQ', landmark: 'hq' },
-  { id: 'work', label: 'Work', marker: '03', name: 'Work', nick: 'The Skyline', landmark: 'data-tower' },
-  { id: 'skills', label: 'Skills', marker: '04', name: 'Skills', nick: 'The Toolbox', landmark: 'stack' },
-  { id: 'experience', label: 'Experience', marker: '05', name: 'Experience', nick: 'Career Tower', landmark: 'control' },
-  { id: 'listening', label: 'Books & Podcasts', marker: '06', name: 'Books & Podcasts', nick: 'The Listening Post', landmark: 'listening' },
-  { id: 'contact', label: 'Contact', marker: '07', name: 'Contact', nick: 'The Front Door', landmark: 'core' },
+  { id: 'about', label: 'About & Experience', marker: '02', name: 'About & Experience', nick: 'Waldrop HQ', landmark: 'hq' },
+  { id: 'work', label: 'Work Projects', marker: '03', name: 'Work Projects', nick: 'The Skyline', landmark: 'data-tower', bucket: 'work' },
+  { id: 'ideas', label: 'Passion Projects', marker: '04', name: 'Passion Projects', nick: 'Ideas Lab', landmark: 'lab', bucket: 'ideas' },
+  { id: 'listening', label: 'Books & Podcasts', marker: '05', name: 'Books & Podcasts', nick: 'The Listening Post', landmark: 'listening' },
+  { id: 'contact', label: 'Contact', marker: '06', name: 'Contact', nick: 'The Front Door', landmark: 'core' },
 ];
+// old links (#/skills, #/experience) still work: they open the section on Waldrop HQ
+const ALIASES = { skills: 'about', experience: 'about' };
+const bucketOf = (p) => p.bucket || 'work';
+const inBucket = (b) => projects.filter((p) => bucketOf(p) === b);
 
 const marker = (pg) => `<p class="marker mono"><span class="marker-n">${pg.marker}</span><span class="marker-line" aria-hidden="true"></span>${pg.nick}</p>`;
 
@@ -41,51 +44,13 @@ function pageHTML(pg, sub) {
         <h2 class="sub-h">Education</h2>
         <ul class="edu">
           ${about.education.map((e) => `<li><p class="edu-school">${esc(e.school)}</p><p class="edu-degree">${esc(e.degree)}</p>${e.note ? `<p class="mono edu-note">${esc(e.note)}</p>` : ''}</li>`).join('')}
-        </ul>` : ''}`;
-
-    case 'work': {
-      // a single project: its own page, reached from its building
-      const p = sub ? projects.find((x) => x.id === sub) : null;
-      if (p) {
-        const lm = lmById(p.landmark);
-        const plinks = [link(p.links.caseStudy, 'Case study ↗'), link(p.links.demo, 'Live demo ↗'), link(p.links.source, 'Source ↗')].filter(Boolean).join('');
-        return `
-        <p class="mono crumb"><a href="#/work">← All work</a></p>
-        <article class="project featured solo" style="--accent:${COLORS[lm ? lm.color : 'cyan']}">
-          <p class="mono p-meta"><span class="p-dot" aria-hidden="true"></span>${lm ? `${esc(lm.sub)} · ` : ''}${ph(p.category)}</p>
-          <h1 id="pageTitle" tabindex="-1">${ph(p.name)}</h1>
-          <p class="mono p-sub">${ph(p.role)} · ${ph(p.year)}</p>
-          <dl class="p-grid">
-            <div><dt class="mono">Problem</dt><dd>${ph(p.problem)}</dd></div>
-            <div><dt class="mono">Approach</dt><dd>${ph(p.approach)}</dd></div>
-            <div><dt class="mono">Tools</dt><dd class="chips">${p.tools.map((t) => `<span class="chip">${ph(t)}</span>`).join('')}</dd></div>
-            ${p.outcome ? `<div><dt class="mono">Outcome</dt><dd>${ph(p.outcome)}</dd></div>` : ''}
-          </dl>
-          ${plinks ? `<p class="p-links mono">${plinks}</p>` : ''}
-        </article>`;
-      }
-      // the index: one line per project
-      return `
-        ${marker(pg)}
-        <h1 id="pageTitle" tabindex="-1">The skyline: what I’ve built.</h1>
-        <p class="body">The projects with a building have their name on the map — drive over, or pick one here.</p>
-        <ul class="work-index">
-          ${projects.map((x) => {
-            const lm = lmById(x.landmark);
-            return `<li style="--accent:${COLORS[lm ? lm.color : 'cyan']}"><a href="#/work/${x.id}">
-              <span class="wi-main"><span class="mono wi-meta"><span class="p-dot" aria-hidden="true"></span>${x.landmark && lm ? esc(lm.sub) + ' · ' : ''}${ph(x.year)}</span><span class="wi-name">${ph(x.name)}</span><span class="wi-cat">${ph(x.category)}</span></span>
-              <span class="mono wi-go" aria-hidden="true">Open →</span>
-            </a></li>`;
-          }).join('')}
-        </ul>`;
-    }
-
-    case 'skills':
-      return `
-        ${marker(pg)}
-        <h1 id="pageTitle" tabindex="-1">The toolbox: what I reach for.</h1>
-        <p class="body">Pick a tool to see how I actually use it.</p>
-        <div class="board">
+        </ul>` : ''}
+        <p class="mono jump">Jump to <a href="#sec-skills" data-jump="sec-skills">Skills</a> · <a href="#sec-experience" data-jump="sec-experience">Experience</a>${links.resume ? ` · ${link(links.resume, 'Résumé ↗')}` : ''}</p>
+        <section class="hq-sec" id="sec-skills" aria-labelledby="sec-skills-h">
+          <p class="marker mono"><span class="marker-line" aria-hidden="true"></span>The Toolbox</p>
+          <h2 class="sec-h" id="sec-skills-h">What I reach for.</h2>
+          <p class="body">Pick a tool to see how I actually use it.</p>
+          <div class="board">
           ${skills.map((g, gi) => `
             <div class="bus" style="--bus:${COLORS[g.color]}">
               <p class="mono bus-name">${esc(g.group)}</p>
@@ -94,24 +59,69 @@ function pageHTML(pg, sub) {
               </ul>
             </div>`).join('')}
         </div>
-        <div class="readout" id="readout" aria-live="polite"><p class="mono readout-k">&gt; select a node</p></div>`;
-
-    case 'experience':
-      return `
-        ${marker(pg)}
-        <h1 id="pageTitle" tabindex="-1">Career Tower, floor by floor.</h1>
-        <p class="body">Newest floor on top.</p>
-        <ol class="timeline">
+        <div class="readout" id="readout" aria-live="polite"><p class="mono readout-k">&gt; select a node</p></div>
+        </section>
+        <section class="hq-sec" id="sec-experience" aria-labelledby="sec-experience-h">
+          <p class="marker mono"><span class="marker-line" aria-hidden="true"></span>Career Tower</p>
+          <h2 class="sec-h" id="sec-experience-h">Floor by floor.</h2>
+          <p class="body">Newest floor on top.</p>
+          <ol class="timeline">
           ${experience.map((e) => `
             <li class="module">
               <p class="mono m-dates">${ph(e.dates)}</p>
-              <h2>${ph(e.role)} <span class="m-org">· ${ph(e.org)}</span></h2>
+              <h3 class="m-role">${ph(e.role)} <span class="m-org">· ${ph(e.org)}</span></h3>
               <p class="body">${ph(e.summary)}</p>
               ${e.highlights.length ? `<ul class="m-high">${e.highlights.map((h) => `<li>${ph(h)}</li>`).join('')}</ul>` : ''}
-              ${(e.projects || []).length ? `<p class="mono m-proj">Projects: ${e.projects.map((id) => projects.find((x) => x.id === id)).filter(Boolean).map((x) => `<a href="#/work/${x.id}">${esc(x.name)} →</a>`).join('')}</p>` : ''}
+              ${(e.projects || []).length ? `<p class="mono m-proj">Projects: ${e.projects.map((id) => projects.find((x) => x.id === id)).filter(Boolean).map((x) => `<a href="#/${(x.bucket || 'work') === 'ideas' ? 'ideas' : 'work'}/${x.id}">${esc(x.name)} →</a>`).join('')}</p>` : ''}
             </li>`).join('')}
         </ol>
-        <p class="mono resume">${links.resume ? link(links.resume, 'View the full résumé ↗') : '<span class="ph">[add your résumé PDF to show a download link]</span>'}</p>`;
+        <p class="mono resume">${links.resume ? link(links.resume, 'View the full résumé ↗') : '<span class="ph">[add your résumé PDF to show a download link]</span>'}</p>
+        </section>`;
+
+    case 'work':
+    case 'ideas': {
+      // a single project: its own page, reached from its building
+      const lm = lmById(pg.landmark);
+      const list = inBucket(pg.bucket);
+      const p = sub ? projects.find((x) => x.id === sub) : null;
+      if (p) {
+        const plinks = [link(p.links.caseStudy, 'Case study ↗'), link(p.links.demo, 'Live demo ↗'), link(p.links.source, 'Source ↗')].filter(Boolean).join('');
+        return `
+        <p class="mono crumb"><a href="#/${pg.id}">← All ${pg.bucket === 'ideas' ? 'passion projects' : 'work projects'}</a></p>
+        <article class="project featured solo" style="--accent:${COLORS[lm ? lm.color : 'cyan']}">
+          <p class="mono p-meta"><span class="p-dot" aria-hidden="true"></span>${ph(p.category)}</p>
+          <h1 id="pageTitle" tabindex="-1">${ph(p.name)}</h1>
+          <p class="mono p-sub">${ph(p.role)} · ${ph(p.year)}</p>
+          <dl class="p-grid">
+            <div><dt class="mono">Problem</dt><dd>${ph(p.problem)}</dd></div>
+            <div><dt class="mono">Approach</dt><dd>${ph(p.approach)}</dd></div>
+            <div><dt class="mono">Tools</dt><dd class="chips">${p.tools.map((t) => `<span class="chip">${ph(t)}</span>`).join('')}</dd></div>
+            ${p.outcome ? `<div><dt class="mono">Outcome</dt><dd>${ph(p.outcome)}</dd></div>` : ''}
+          </dl>
+          ${(p.images || []).map((im) => `
+          <figure class="p-fig">
+            <a href="${esc(im.src)}" target="_blank" rel="noopener"><img src="${esc(im.src)}" alt="${esc(im.alt)}" decoding="async"></a>
+            <figcaption>${ph(im.caption)} <a class="mono" href="${esc(im.src)}" target="_blank" rel="noopener">Full size ↗</a></figcaption>
+          </figure>`).join('')}
+          ${plinks ? `<p class="p-links mono">${plinks}</p>` : ''}
+        </article>`;
+      }
+      // the index: one line per project in this building
+      const heads = {
+        work: ['The skyline: work projects.', 'Problems I’ve worked on — what was broken, what I did, and what changed.'],
+        ideas: ['Ideas Lab: things I build for fun.', 'Side projects and experiments — built to learn something, not because anyone asked.'],
+      }[pg.bucket];
+      return `
+        ${marker(pg)}
+        <h1 id="pageTitle" tabindex="-1">${heads[0]}</h1>
+        <p class="body">${heads[1]}</p>
+        <ul class="work-index" style="--accent:${COLORS[lm.color]}">
+          ${list.map((x) => `<li><a href="#/${pg.id}/${x.id}">
+              <span class="wi-main"><span class="mono wi-meta"><span class="p-dot" aria-hidden="true"></span>${ph(x.year)}</span><span class="wi-name">${ph(x.name)}</span><span class="wi-cat">${ph(x.category)}</span></span>
+              <span class="mono wi-go" aria-hidden="true">Open →</span>
+            </a></li>`).join('')}
+        </ul>`;
+    }
 
     case 'listening': {
       const items = allListening();
@@ -257,13 +267,14 @@ function entryHTML(x, big) {
 // next / previous building, so a visitor can tour the city page by page
 function pagerHTML(pg, project) {
   if (project) {
-    const j = projects.indexOf(project);
-    const pp = projects[j - 1], np = projects[j + 1];
+    const list = inBucket(pg.bucket);
+    const j = list.indexOf(project);
+    const pp = list[j - 1], np = list[j + 1];
     const after = PAGES[PAGES.indexOf(pg) + 1];
     return `
     <nav class="pager" aria-label="More projects">
-      ${pp ? `<a href="#/work/${pp.id}" class="mono"><span>← Project ${j}</span>${esc(pp.name)}</a>` : `<a href="#/work" class="mono"><span>←</span>All work</a>`}
-      ${np ? `<a href="#/work/${np.id}" class="mono next"><span>Project ${j + 2} →</span>${esc(np.name)}</a>` : `<a href="#/${after.id}" class="mono next"><span>${after.marker} →</span>${after.label}</a>`}
+      ${pp ? `<a href="#/${pg.id}/${pp.id}" class="mono"><span>← Project ${j}</span>${esc(pp.name)}</a>` : `<a href="#/${pg.id}" class="mono"><span>←</span>All ${pg.bucket === 'ideas' ? 'passion projects' : 'work projects'}</a>`}
+      ${np ? `<a href="#/${pg.id}/${np.id}" class="mono next"><span>Project ${j + 2} →</span>${esc(np.name)}</a>` : `<a href="#/${after.id}" class="mono next"><span>${after.marker} →</span>${after.label}</a>`}
     </nav>
     <p class="mono foot">© ${new Date().getFullYear()} ${esc(person.name)} · hand-built city · no trackers</p>`;
   }
@@ -378,8 +389,12 @@ let returnFocus = null;
 function parse(hash) {
   const m = /^#\/([\w-]+)(?:\/([\w-]+))?/.exec(hash || '');
   if (!m) return null;
-  const pg = PAGES.find((p) => p.id === m[1]);
-  return pg ? { pg, sub: m[2] || null } : null;
+  const id = ALIASES[m[1]] || m[1];
+  const pg = PAGES.find((p) => p.id === id);
+  if (!pg) return null;
+  // a project link that names the wrong building (old #/work/ideas links) still opens the project
+  const sub = m[2] && pg.bucket ? m[2] : null;
+  return { pg, sub, section: ALIASES[m[1]] ? 'sec-' + m[1] : null };
 }
 
 function route() {
@@ -403,13 +418,13 @@ function route() {
     return;
   }
 
-  // a project inside Work flies to that project's own building
-  const project = r.sub ? projects.find((p) => p.id === r.sub) : null;
-  // projects without their own building fly to the page's building
-  const lm = lmById(project && project.landmark ? project.landmark : r.pg.landmark);
+  const found = r.sub ? projects.find((p) => p.id === r.sub) : null;
+  if (found && bucketOf(found) !== r.pg.bucket) { location.replace(`#/${bucketOf(found) === 'ideas' ? 'ideas' : 'work'}/${found.id}`); return; }
+  const project = found;
+  const lm = lmById(r.pg.landmark);   // every page and project flies to its bucket's building
   if (!current) { returnFocus = document.activeElement; city && city.saveView(); }
 
-  const key = r.pg.id + (r.sub ? '/' + r.sub : '');   // each project is its own page
+  const key = r.pg.id + (project ? '/' + project.id : '');   // each project is its own page
   const switching = current && current !== key;
   const same = current === key;
   current = key;
@@ -427,12 +442,13 @@ function route() {
       body.scrollTop = 0;
     }
     $('#sheetWhere').textContent = project
-      ? `Project ${projects.indexOf(project) + 1} / ${projects.length}${project.landmark ? ' · ' + lm.sub : ''}`
+      ? `Project ${inBucket(r.pg.bucket).indexOf(project) + 1} / ${inBucket(r.pg.bucket).length} · ${r.pg.nick}`
       : `${r.pg.marker} / ${String(PAGES.length + 1).padStart(2, '0')} · ${r.pg.nick}`;
     sheet.hidden = false;
     void sheet.offsetWidth;
     sheet.classList.add('open');
     if (!same) { const t = $('#pageTitle', body); t && t.focus({ preventScroll: true }); }
+    if (r.section) { const el = $('#' + r.section, body); el && el.scrollIntoView({ block: 'start' }); }
   };
 
   if (reduced.matches || same) show();
@@ -448,7 +464,8 @@ function route() {
 
 function wirePage() {
   // Input Log: jump to Books / Podcasts (scrolls inside the page panel; no URL change)
-  $$('[data-jump]', body).forEach((b) => b.addEventListener('click', () => {
+  $$('[data-jump]', body).forEach((b) => b.addEventListener('click', (e) => {
+    e.preventDefault();   // in-page jump: keep the page's own URL
     const el = $('#' + b.dataset.jump, body);
     if (el) el.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
   }));
@@ -500,8 +517,7 @@ window.addEventListener('resize', () => {
   city.resize();
   const r = parse(location.hash);
   if (r) {
-    const project = r.sub ? projects.find((p) => p.id === r.sub) : null;
-    city.setView(focusView(lmById(project ? project.landmark : r.pg.landmark)), true);
+    city.setView(focusView(lmById(r.pg.landmark)), true);
   }
   city.setHome(homeView());
 });

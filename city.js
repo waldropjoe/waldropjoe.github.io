@@ -18,18 +18,20 @@ export const COLORS = {
   text: '#F5F3FF',
 };
 
-// Landmarks are the buildings you can visit. `target` is the page anchor.
-export const LANDMARKS = [
-  { id: 'data-tower', name: 'Reporting', sub: 'Dashboard Tower', target: '#/work/reporting', x: -28, y: 14, w: 6.2, d: 6.2, h: 34, color: 'cyan', roof: 'spire', spot: [-21, 14] },
-  { id: 'relay', name: 'Integrations', sub: 'API Exchange', target: '#/work/integration', x: 28, y: -28, w: 6.4, d: 5.4, h: 21, color: 'magenta', roof: 'antenna', spot: [21, -28] },
-  { id: 'lab', name: 'This Site', sub: 'The Workshop', target: '#/work/ideas', x: 28, y: 14, w: 6.4, d: 6.4, h: 11, color: 'yellow', roof: 'step', spot: [21, 14] },
-  { id: 'switchboard', name: 'Issue Log', sub: 'Bug Catcher', target: '#/work/issue-log', x: 28, y: 28, w: 6, d: 6, h: 18, color: 'violet', roof: 'antenna', spot: [21, 28], keepLayout: true },
-  { id: 'hq', name: 'About', sub: 'Waldrop HQ', target: '#/about', x: -38.5, y: -38.5, w: 11, d: 11, h: 10, color: 'violet', roof: 'sign', spot: [-21, -38.5] },
+// Special buildings. Those you can visit have a label and a `target` page; `scenery: true`
+// ones keep their distinctive shape but are just part of the skyline.
+const PLACES = [
+  { id: 'data-tower', name: 'Work Projects', sub: 'The Skyline', target: '#/work', x: -28, y: 14, w: 6.2, d: 6.2, h: 34, color: 'cyan', roof: 'spire', spot: [-21, 14] },
+  { id: 'relay', scenery: true, x: 28, y: -28, w: 6.4, d: 5.4, h: 21, color: 'magenta', roof: 'antenna', spot: [21, -28] },
+  { id: 'lab', name: 'Passion Projects', sub: 'Ideas Lab', target: '#/ideas', x: 28, y: 14, w: 6.4, d: 6.4, h: 11, color: 'yellow', roof: 'step', spot: [21, 14] },
+  { id: 'switchboard', scenery: true, x: 28, y: 28, w: 6, d: 6, h: 18, color: 'violet', roof: 'antenna', spot: [21, 28], keepLayout: true },
+  { id: 'hq', name: 'About & Experience', sub: 'Waldrop HQ', target: '#/about', x: -38.5, y: -38.5, w: 11, d: 11, h: 10, color: 'violet', roof: 'sign', spot: [-21, -38.5] },
   { id: 'listening', name: 'Books & Podcasts', sub: 'The Listening Post', target: '#/listening', x: -28, y: 28, w: 6, d: 6, h: 9, color: 'magenta', roof: 'mast', spot: [-21, 28] },
-  { id: 'stack', name: 'Skills', sub: 'The Toolbox', target: '#/skills', x: 14, y: -28, w: 5.4, d: 5.4, h: 28, color: 'yellow', roof: 'spire', spot: [14, -21] },
-  { id: 'control', name: 'Experience', sub: 'Career Tower', target: '#/experience', x: 0, y: 28, w: 6.4, d: 5.6, h: 15, color: 'orange', roof: 'antenna', spot: [0, 21] },
+  { id: 'stack', scenery: true, x: 14, y: -28, w: 5.4, d: 5.4, h: 28, color: 'yellow', roof: 'spire', spot: [14, -21] },
+  { id: 'control', scenery: true, x: 0, y: 28, w: 6.4, d: 5.6, h: 15, color: 'orange', roof: 'antenna', spot: [0, 21] },
   { id: 'core', name: 'Contact', sub: 'The Front Door', target: '#/contact', core: true, x: 0, y: 0, h: 1.6, spot: [0, -12.6] },
 ];
+export const LANDMARKS = PLACES.filter((l) => !l.scenery);
 
 // The road network: four avenues and four short spokes into the core.
 // Each road is an axis-aligned line: { axis: 'v', at: x, from: y0, to: y1 } or { axis: 'h', at: y, from: x0, to: x1 }.
@@ -89,7 +91,7 @@ function buildWorld(lite) {
   const R = rng(20261025);
   const buildings = [];
   const palette = ['cyan', 'cyan', 'cyan', 'turq', 'turq', 'magenta', 'magenta', 'yellow', 'violet', 'orange'];
-  const landmarkAt = new Map(LANDMARKS.filter((l) => !l.core).map((l) => [`${l.x},${l.y}`, l]));
+  const landmarkAt = new Map(PLACES.filter((l) => !l.core).map((l) => [`${l.x},${l.y}`, l]));
 
   const comps = [];
   const accent = { cyan: 'magenta', turq: 'yellow', magenta: 'cyan', yellow: 'magenta', violet: 'cyan', orange: 'yellow' };
@@ -123,8 +125,8 @@ function buildWorld(lite) {
     };
   }
 
-  const hqLm = LANDMARKS.find((l) => l.id === 'hq');
-  buildings.push({ ...hqLm, landmark: 'hq', z: 0, units: [], band: 'cyan', warm: true, seed: seed++, phase: 0 });
+  const hqLm = PLACES.find((l) => l.id === 'hq');
+  buildings.push({ ...hqLm, landmark: 'hq', special: true, z: 0, units: [], band: 'cyan', warm: true, seed: seed++, phase: 0 });
   for (let i = 0; i < 13; i++) {
     for (let j = 0; j < 13; j++) {
       const cx = -42 + 7 * i;
@@ -134,7 +136,7 @@ function buildWorld(lite) {
       if (cx <= -35 && cy <= -35) continue;                                       // Waldrop HQ block
       const lm = landmarkAt.get(`${cx},${cy}`);
       if (lm) {
-        buildings.push({ ...lm, landmark: lm.id, z: 0, units: [], band: accent[lm.color], warm: true, seed: seed++, phase: 0 });
+        buildings.push({ ...lm, landmark: lm.scenery ? null : lm.id, special: true, z: 0, units: [], band: accent[lm.color], warm: true, seed: seed++, phase: 0 });
         if (!lm.keepLayout) continue;
       }
       // a landmark added later sits on a lot that used to be generated: still roll that lot's dice
@@ -649,7 +651,7 @@ export function createCity(canvas, { labelLayer, tooltip, onEnter, onNear = () =
   function building(b) {
     const hot = b.landmark && (hovered === b.landmark || focused === b.landmark);
     const out = b.landmark ? [] : null;
-    const topColor = b.color === 'cyan' || b.color === 'turq' ? (b.landmark ? 'yellow' : null) : null;
+    const topColor = b.color === 'cyan' || b.color === 'turq' ? (b.special ? 'yellow' : null) : null;
     const base = { hot, out };
     if (b.roof === 'sign') {
       box(b, b.x, b.y, 0, b.w, b.d, b.h * 0.6, b.color, { ...base, tier: 0, topColor: 'cyan' });
@@ -670,10 +672,10 @@ export function createCity(canvas, { labelLayer, tooltip, onEnter, onNear = () =
       roofUnits(b, b.h, 0.66);
     } else if (b.roof === 'spire') {
       box(b, b.x, b.y, 0, b.w, b.d, b.h * 0.78, b.color, { ...base, tier: 0, topColor: 'yellow' });
-      spire(b.x, b.y, b.h * 0.78, b.w * 0.82, b.d * 0.82, b.h * 0.36, b.landmark ? 'yellow' : 'magenta', hot, out);
+      spire(b.x, b.y, b.h * 0.78, b.w * 0.82, b.d * 0.82, b.h * 0.36, b.special ? 'yellow' : 'magenta', hot, out);
     } else {
       box(b, b.x, b.y, 0, b.w, b.d, b.h, b.color, { ...base, tier: 0, topColor });
-      if (b.roof === 'antenna') needle(b.x, b.y, b.h, 4, b.landmark ? 'magenta' : b.color, b.phase);
+      if (b.roof === 'antenna') needle(b.x, b.y, b.h, 4, b.special ? 'magenta' : b.color, b.phase);
       else roofUnits(b, b.h, 1);
     }
     if (b.beacon) {

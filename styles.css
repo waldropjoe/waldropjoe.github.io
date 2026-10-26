@@ -493,3 +493,18 @@ body.page-open .hero { opacity: 0; visibility: hidden; transition: opacity .3s e
 
 /* header: just the brand and the Directory button */
 .nav .dir-btn { margin-left: auto; }
+
+/* Waldrop HQ: about, skills and experience on one page */
+.jump { margin: 28px 0 0; font-size: 11px; color: var(--muted); }
+.jump a { color: var(--cyan); text-decoration: none; }
+.jump a:hover { text-decoration: underline; }
+.hq-sec { margin-top: 64px; padding-top: 28px; border-top: 1px solid var(--line); scroll-margin-top: 16px; }
+.hq-sec .marker { margin-bottom: 12px; }
+.page .sec-h { font-size: clamp(24px, 2.4vw, 32px); line-height: 1.1; margin: 0 0 12px; }
+.page .m-role { font-size: 20px; line-height: 1.25; margin: 0 0 8px; }
+
+/* project screenshots */
+.p-fig { margin: 28px 0 0; }
+.p-fig img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
+.p-fig figcaption { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.p-fig figcaption a { font-size: 11px; color: var(--cyan); text-decoration: none; margin-left: 4px; white-space: nowrap; }

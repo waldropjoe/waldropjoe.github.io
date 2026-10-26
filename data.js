@@ -37,12 +37,11 @@ export const about = {
   ],
 };
 
-// Each project is a building in the city. `landmark` links it to a building on the
-// chip (see city.js LANDMARKS); projects without one are listed on the Work page only.
+// Projects. `bucket: 'work'` (default) appears in the Work Projects building;
+// `bucket: 'ideas'` in Passion Projects (the Ideas Lab). Order here = order on the site.
 export const projects = [
   {
     id: 'reporting',
-    landmark: 'data-tower',
     name: 'Automated Project Reporting',
     category: 'Data analytics · Reporting automation',
     problem: 'Project information for a revenue cycle application program lived in manual status reports, which took time to assemble and was hard for teams to get to.',
@@ -55,7 +54,6 @@ export const projects = [
   },
   {
     id: 'integration',
-    landmark: 'relay',
     name: 'ERP ↔ Tax Engine Integrations',
     category: 'API integrations · Data mapping · Testing',
     problem: 'Enterprise clients implementing tax technology (Vertex O-Series and others) needed their ERP systems, often SAP ECC, to exchange transaction data with the tax engine correctly.',
@@ -92,20 +90,23 @@ export const projects = [
   },
   {
     id: 'issue-log',
-    landmark: 'switchboard',
     name: 'Webex Pilot Issue Log',
     category: 'AI triage · Automation · Concept build',
     problem: 'Picture an alpha pilot whose feedback all lands in one Webex space. Reading it by hand to separate real issues from chatter doesn’t scale, and issues get lost or logged twice.',
     approach: 'Built a scheduled Python pipeline: it reads new messages over the Webex API, has an LLM (Gemini, with structured output) decide what’s a real issue and assign a title, category, severity and possible duplicate, then creates Azure DevOps work items — tagged with the message ID so a retry never makes a duplicate. SQLite is the source of truth; an Excel log is regenerated from it on every run, and issues resolved in Azure DevOps are synced back.',
     tools: ['Python', 'Webex REST API', 'Google Gemini', 'Pydantic', 'SQLite', 'Azure DevOps REST API', 'openpyxl', 'launchd'],
     outcome: 'A working end-to-end prototype, tested against my own Webex space and a personal Azure DevOps sandbox (no company data). Runs every 15 minutes with no manual steps.',
-    role: 'Personal project · design & build',
+    images: [
+      { src: 'img/issue-log-ado.png', alt: 'Azure DevOps bug #14, created automatically from a Webex message: the AI-written title, the original message in the description, state To Do', caption: 'A real run: a test message posted in my own Webex space became Azure DevOps bug #14, with an AI-written title and the original message attached. The message-ID tag (used to prevent duplicates) is blurred.' },
+      { src: 'img/issue-log-real.png', alt: 'Excel issue log with two rows: ISSUE-0001 resolved as work item 13, ISSUE-0002 new as work item 14', caption: 'The Excel log from the same runs. Bug #13 was closed in Azure DevOps, so the next run marked ISSUE-0001 Resolved on its own.' },
+    ],
+    role: 'Personal project · design & build',   // bucketed with work projects by choice
     year: '2026',
     links: { caseStudy: '', demo: '', source: 'https://github.com/waldropjoe/webex-issue-log' },
   },
   {
     id: 'ideas',
-    landmark: 'lab',
+    bucket: 'ideas',
     name: 'Waldropolis (this site)',
     category: 'Product concept · Interactive application',
     problem: 'A résumé lists what you did. It doesn’t show how you think about systems.',

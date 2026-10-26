@@ -1,13 +1,13 @@
 # waldropjoe.github.io — Waldropolis
 
-Joe Waldrop's portfolio, built as a neon city on a computer chip. Each labelled building is a page or a project: click to drive the car there, press Enter (or click the building) to go in, or open the **Directory** for a plain list. Every project also has its own page at `#/work/<id>`.
+Joe Waldrop's portfolio, built as a neon city on a computer chip. Five labelled buildings hold the content: **About & Experience** (Waldrop HQ: about, skills, experience), **Work Projects**, **Passion Projects** (Ideas Lab), **Books & Podcasts** and **Contact**. Click to drive the car there, press Enter (or click the building) to go in, or open the **Directory** for a plain list. Each project has its own page at `#/work/<id>` or `#/ideas/<id>`; old `#/skills` and `#/experience` links open those sections on Waldrop HQ.
 
 No build step and no dependencies — plain HTML, CSS and JavaScript modules.
 
 | File | What it is |
 | --- | --- |
-| `data.js` | **All content** — projects, skills, experience, education, books & podcasts (`listening`), links. Edit this to update the site. `[Bracketed]` text is a placeholder and shows dimmed. Empty links and empty project outcomes are hidden. |
-| `city.js` | The isometric canvas engine: chip, traces, buildings, the car, roads, camera and controls. Buildings you can enter are in `LANDMARKS` (plain `name`, nickname in `sub`). |
+| `data.js` | **All content** — projects (`bucket: 'work'` or `'ideas'` picks the building), skills, experience, education, books & podcasts (`listening`), links. Edit this to update the site. `[Bracketed]` text is a placeholder and shows dimmed. Empty links and empty project outcomes are hidden. |
+| `city.js` | The isometric canvas engine: chip, traces, buildings, the car, roads, camera and controls. Special buildings are in `PLACES`: the ones with a `target` can be entered (plain `name`, nickname in `sub`); `scenery: true` ones keep their shape but have no page. |
 | `main.js` | Pages and routing (`#/about`, `#/work`, `#/work/<id>`, …), the Directory and the controls dialog. Section nicknames are in `PAGES`. |
 | `styles.css` | Design tokens, layout, responsive and reduced-motion rules. |
 | `Joseph_Waldrop_Resume.pdf` | The résumé the site links to (no phone number). |
