@@ -26,7 +26,7 @@ export const about = {
     'Before that I spent several years on the systems side: implementing tax technology integrated with SAP at KPMG and Ducharme, McMillen & Associates — mapping data, testing API integrations, and supporting go-lives — and running a revenue cycle application program at Parallon.',
     'Most of my work sits between the people who need something and the systems that have to deliver it. I like understanding how things work, finding where a process leaks time or clarity, and building the thing that fixes it.',
   ],
-  photo: { src: 'headshot.jpg', alt: 'Joe Waldrop, smiling, in a navy blazer' },
+  photo: { src: 'img/headshot.jpg', alt: 'Joe Waldrop, smiling, in a navy blazer' },
   // Off the clock: shown on the About page
   offClock: [
     { k: 'KITCHEN', text: 'Amateur chef and home bartender.' },
