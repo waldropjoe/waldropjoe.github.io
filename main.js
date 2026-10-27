@@ -1,6 +1,6 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=25';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=25';
-import * as content from './data.js?v=25';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=26';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=26';
+import * as content from './data.js?v=26';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -98,6 +98,11 @@ function pageHTML(pg, sub) {
             <div><dt class="mono">Tools</dt><dd class="chips">${p.tools.map((t) => `<span class="chip">${ph(t)}</span>`).join('')}</dd></div>
             ${p.outcome ? `<div><dt class="mono">Outcome</dt><dd>${ph(p.outcome)}</dd></div>` : ''}
           </dl>
+          ${(p.story || []).length ? `
+          <section class="story" aria-label="The longer story">
+            <p class="mono story-k">The longer story</p>
+            ${p.story.map((st) => `<h2 class="story-h">${ph(st.h)}</h2><p class="body">${ph(st.p)}</p>`).join('')}
+          </section>` : ''}
           ${(p.images || []).map((im) => `
           <figure class="p-fig">
             <a href="${esc(im.src)}" target="_blank" rel="noopener"><img src="${esc(im.src)}" alt="${esc(im.alt)}" decoding="async"></a>

@@ -508,3 +508,9 @@ body.page-open .hero { opacity: 0; visibility: hidden; transition: opacity .3s e
 .p-fig img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
 .p-fig figcaption { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.5; }
 .p-fig figcaption a { font-size: 11px; color: var(--cyan); text-decoration: none; margin-left: 4px; white-space: nowrap; }
+
+/* case-study text on a project page */
+.story { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--line); }
+.story-k { margin: 0 0 6px; font-size: 11px; color: var(--accent, var(--cyan)); }
+.page .project .story-h { font-size: 18px; line-height: 1.3; margin: 22px 0 6px; }
+.story .body { margin: 0; }
