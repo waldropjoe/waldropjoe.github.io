@@ -27,7 +27,8 @@ const PLACES = [
   { id: 'switchboard', scenery: true, x: 28, y: 28, w: 6, d: 6, h: 18, color: 'violet', roof: 'antenna', spot: [21, 28], keepLayout: true },
   { id: 'hq', name: 'About & Experience', sub: 'Waldrop HQ', target: '#/about', x: -38.5, y: -38.5, w: 11, d: 11, h: 10, color: 'violet', roof: 'sign', spot: [-21, -38.5] },
   { id: 'listening', name: 'Books & Podcasts', sub: 'The Listening Post', target: '#/listening', x: -28, y: 28, w: 6, d: 6, h: 9, color: 'magenta', roof: 'mast', spot: [-21, 28] },
-  { id: 'stack', scenery: true, x: 14, y: -28, w: 5.4, d: 5.4, h: 28, color: 'yellow', roof: 'spire', spot: [14, -21] },
+  // Skills: a mechanic's rolling tool chest — one drawer per skill group, in that group's colour
+  { id: 'stack', name: 'Skills', sub: 'The Toolbox', target: '#/skills', x: 14, y: -28, w: 6.6, d: 5.2, h: 15.5, color: 'orange', roof: 'chest', spot: [14, -21] },
   { id: 'control', scenery: true, x: 0, y: 28, w: 6.4, d: 5.6, h: 15, color: 'orange', roof: 'antenna', spot: [0, 21] },
   { id: 'core', name: 'Contact', sub: 'The Front Door', target: '#/contact', core: true, x: 0, y: 0, h: 1.6, spot: [0, -12.6] },
 ];
@@ -277,7 +278,7 @@ function snapToRoad(p) {
 }
 
 // ---------- the renderer ----------
-export function createCity(canvas, { labelLayer, tooltip, onEnter, onNear = () => {}, canDrive = () => true, reducedMotion }) {
+export function createCity(canvas, { labelLayer, tooltip, onEnter, onNear = () => {}, canDrive = () => true, reducedMotion, toolDrawers = ['orange', 'magenta', 'cyan', 'yellow', 'orange'] }) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
 
@@ -297,6 +298,8 @@ export function createCity(canvas, { labelLayer, tooltip, onEnter, onNear = () =
   let running = true;
   let dirty = true;
   let time = 0;
+  let drawerLit = -1;      // the tool-chest drawer of the skill group last picked (-1 = none)
+  let drawerLitAt = 0;
 
   // ---- the car: the way you get around the island ----
   const graph = buildGraph();
@@ -648,6 +651,88 @@ export function createCity(canvas, { labelLayer, tooltip, onEnter, onNear = () =
     }
   }
 
+  // ---- the Skills building: a rolling tool chest ----
+  const CHEST = { base: 1.1, lid: 1.5, handle: 2.4 };
+  function chest(b, hot, out) {
+    const { x, y, w, d } = b;
+    const z0 = CHEST.base, zTop = b.h - CHEST.lid;
+    // dark plinth with a metal caster at each corner
+    box(null, x, y, 0, w * 0.86, d * 0.82, z0, '#1B1735', { windows: false, noEdge: true, out });
+    const casters = [[-1, -1], [1, -1], [1, 1], [-1, 1]]
+      .map(([sx, sy]) => [x + sx * w * 0.38, y + sy * d * 0.34])
+      .sort((p, q) => depth(p[0], p[1]) - depth(q[0], q[1]));
+    for (const [cx_, cy_] of casters) box(null, cx_, cy_, 0, 0.75, 0.75, 0.55, '#C9C6D8', { windows: false, noEdge: true });
+    // drawers, bottom up; deeper drawers at the bottom like a real chest
+    const n = toolDrawers.length;
+    const weights = toolDrawers.map((_, i) => 1 + (n - 1 - i) * 0.12);   // index 0 = top drawer
+    const total = weights.reduce((a, v) => a + v, 0);
+    let z = z0;
+    for (let i = n - 1; i >= 0; i--) {
+      const dh = (zTop - z0) * weights[i] / total;
+      const col = toolDrawers[i];
+      const lit = i === drawerLit;
+      box(null, x, y, z, w, d, dh, col, { windows: false, hot: hot || lit, noTop: true, noEdge: i !== 0, out });
+      if (lit) glowFaces(x, y, z, w, d, dh, col);
+      pulls(x, y, w, d, z + dh * 0.55, col, lit);
+      z += dh;
+    }
+    // the lid: a darker tray with a carry handle on top
+    box(null, x, y, zTop, w * 1.02, d * 1.02, CHEST.lid, '#3A2E66', { windows: false, hot, topColor: '#2A2260', out });
+    handle(x, y, b.h, w * 0.58, hot);
+  }
+  // the picked skill group's drawer pulses in its own colour
+  function glowFaces(x, y, z, w, d, h, col) {
+    const x0 = x - w / 2, x1 = x + w / 2, y0 = y - d / 2, y1 = y + d / 2;
+    const a = 0.38 + 0.22 * Math.sin((time - drawerLitAt) * 4);
+    ctx.globalAlpha = Math.max(0.12, a);
+    for (const side of SIDES) {
+      if (facing(side.n) <= 0.001) continue;
+      const [p, q] = side.corners(x0, x1, y0, y1);
+      poly([proj(p[0], p[1], z), proj(q[0], q[1], z), proj(q[0], q[1], z + h), proj(p[0], p[1], z + h)], shade(col, 1.55));
+    }
+    ctx.globalAlpha = 1;
+    // a halo out past the edges
+    const c0 = proj(x, y, z + h / 2);
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = COLORS[col] || col;
+    ctx.beginPath(); ctx.ellipse(c0[0], c0[1], k * w * 0.95, k * h * 0.9, 0, 0, 6.283); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  // a bright drawer pull across the middle of each visible face
+  function pulls(x, y, w, d, z, col, lit) {
+    const x0 = x - w / 2, x1 = x + w / 2, y0 = y - d / 2, y1 = y + d / 2;
+    const pulse = lit ? 0.6 + 0.4 * Math.sin((time - drawerLitAt) * 5) : 0;
+    for (const side of SIDES) {
+      if (facing(side.n) <= 0.001) continue;
+      const [a, bq] = side.corners(x0, x1, y0, y1);
+      const t0 = 0.3, t1 = 0.7;
+      const p = proj(lerp(a[0], bq[0], t0), lerp(a[1], bq[1], t0), z);
+      const q = proj(lerp(a[0], bq[0], t1), lerp(a[1], bq[1], t1), z);
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = COLORS.ink; ctx.lineWidth = Math.max(2, k * 0.42);
+      ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke();
+      ctx.strokeStyle = lit ? '#FFFFFF' : shade(col, 1.45); ctx.lineWidth = Math.max(1, k * (0.2 + pulse * 0.12));
+      ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke();
+    }
+  }
+  // the arched carry handle, running along the chest's long side
+  function handle(x, y, zTop, span, hot) {
+    const pts = [];
+    for (let i = 0; i <= 14; i++) {
+      const t = i / 14, ang = Math.PI * t;
+      pts.push(proj(x - span / 2 + span * t, y, zTop + Math.sin(ang) * CHEST.handle));
+    }
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (const [col, lw] of [[COLORS.ink, 0.62], [hot ? '#FFFFFF' : shade('yellow', 1.1), 0.3]]) {
+      ctx.strokeStyle = col; ctx.lineWidth = Math.max(1.5, k * lw);
+      ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+      for (const p of pts.slice(1)) ctx.lineTo(p[0], p[1]);
+      ctx.stroke();
+    }
+    // brackets where the handle meets the lid
+    for (const sx of [-1, 1]) box(null, x + sx * span / 2, y, zTop, 0.6, 0.8, 0.35, '#5B5486', { windows: false, noEdge: true });
+  }
+
   function building(b) {
     const hot = b.landmark && (hovered === b.landmark || focused === b.landmark);
     const out = b.landmark ? [] : null;
@@ -657,6 +742,8 @@ export function createCity(canvas, { labelLayer, tooltip, onEnter, onNear = () =
       box(b, b.x, b.y, 0, b.w, b.d, b.h * 0.6, b.color, { ...base, tier: 0, topColor: 'cyan' });
       box(b, b.x, b.y, b.h * 0.6, b.w * 0.8, b.d * 0.8, b.h * 0.4, b.color, { ...base, tier: 1, topColor: '#2A2260' });
       billboard(b, hot, out);
+    } else if (b.roof === 'chest') {
+      chest(b, hot, out);
     } else if (b.roof === 'mast') {
       box(b, b.x, b.y, 0, b.w, b.d, b.h, b.color, { ...base, tier: 0, topColor: '#2A2260' });
       mast(b, hot, out);
@@ -876,7 +963,7 @@ export function createCity(canvas, { labelLayer, tooltip, onEnter, onNear = () =
     const placed = [];
     const spots = LANDMARKS.map((lm) => {
       const t = tags.get(lm.id);
-      const top = lm.core ? 2.5 : lm.roof === 'mast' ? lm.h + MAST + 2.5 : lm.roof === 'sign' ? lm.h + SIGN.z1 + 2.5 : lm.roof === 'spire' ? lm.h * 1.16 + 2 : lm.roof === 'antenna' ? lm.h + 5.5 : lm.h + 2;
+      const top = lm.core ? 2.5 : lm.roof === 'mast' ? lm.h + MAST + 2.5 : lm.roof === 'chest' ? lm.h + CHEST.handle + 2 : lm.roof === 'sign' ? lm.h + SIGN.z1 + 2.5 : lm.roof === 'spire' ? lm.h * 1.16 + 2 : lm.roof === 'antenna' ? lm.h + 5.5 : lm.h + 2;
       if (!t._w) { t._w = t.offsetWidth; t._h = t.offsetHeight; }   // label text never changes: measure once
       return { lm, t, p: proj(lm.x, lm.y, top), d: depth(lm.x, lm.y) };
     }).sort((a, b) => b.d - a.d);                                       // nearest the viewer first
@@ -1321,6 +1408,7 @@ export function createCity(canvas, { labelLayer, tooltip, onEnter, onNear = () =
       kick();
     },
     visit(id) { const lm = LANDMARKS.find((l) => l.id === id); if (lm) visit(lm); },
+    lightDrawer(i) { drawerLit = i; drawerLitAt = time; kick(); },
     get near() { return near; },
     setHome(v) { home = { ...v }; },
     resetView() { car.follow = false; if (home) { Object.assign(goal, home); speed = 3; kick(); } },

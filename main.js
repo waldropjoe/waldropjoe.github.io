@@ -1,6 +1,6 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=30';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=30';
-import * as content from './data.js?v=30';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=31';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=31';
+import * as content from './data.js?v=31';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -20,11 +20,12 @@ const PAGES = [
   { id: 'about', label: 'About & Experience', marker: '02', name: 'About & Experience', nick: 'Waldrop HQ', landmark: 'hq' },
   { id: 'work', label: 'Work Projects', marker: '03', name: 'Work Projects', nick: 'The Skyline', landmark: 'data-tower', bucket: 'work' },
   { id: 'ideas', label: 'Passion Projects', marker: '04', name: 'Passion Projects', nick: 'Ideas Lab', landmark: 'lab', bucket: 'ideas' },
-  { id: 'listening', label: 'Books & Podcasts', marker: '05', name: 'Books & Podcasts', nick: 'The Listening Post', landmark: 'listening' },
-  { id: 'contact', label: 'Contact', marker: '06', name: 'Contact', nick: 'The Front Door', landmark: 'core' },
+  { id: 'skills', label: 'Skills', marker: '05', name: 'Skills', nick: 'The Toolbox', landmark: 'stack' },
+  { id: 'listening', label: 'Books & Podcasts', marker: '06', name: 'Books & Podcasts', nick: 'The Listening Post', landmark: 'listening' },
+  { id: 'contact', label: 'Contact', marker: '07', name: 'Contact', nick: 'The Front Door', landmark: 'core' },
 ];
-// old links (#/skills, #/experience) still work: they open the section on Waldrop HQ
-const ALIASES = { skills: 'about', experience: 'about' };
+// old #/experience links still work: they open that section on Waldrop HQ
+const ALIASES = { experience: 'about' };
 const bucketOf = (p) => p.bucket || 'work';
 const inBucket = (b) => projects.filter((p) => bucketOf(p) === b);
 
@@ -53,22 +54,7 @@ function pageHTML(pg, sub) {
         <ul class="edu">
           ${about.education.map((e) => `<li><p class="edu-school">${esc(e.school)}</p><p class="edu-degree">${esc(e.degree)}</p>${e.note ? `<p class="mono edu-note">${esc(e.note)}</p>` : ''}</li>`).join('')}
         </ul>` : ''}
-        <p class="mono jump">Jump to <a href="#sec-skills" data-jump="sec-skills">Skills</a> · <a href="#sec-experience" data-jump="sec-experience">Experience</a>${links.resume ? ` · ${link(links.resume, 'Résumé ↗')}` : ''}</p>
-        <section class="hq-sec" id="sec-skills" aria-labelledby="sec-skills-h">
-          <p class="marker mono"><span class="marker-line" aria-hidden="true"></span>The Toolbox</p>
-          <h2 class="sec-h" id="sec-skills-h">What I reach for.</h2>
-          <p class="body">Click a tool to see how I actually use it.</p>
-          <div class="board">
-          ${skills.map((g, gi) => `
-            <div class="bus" style="--bus:${COLORS[g.color]}">
-              <p class="mono bus-name">${esc(g.group)}</p>
-              <ul>
-                ${g.items.map((it, ii) => `<li><button type="button" class="node" data-skill="${gi}-${ii}" aria-pressed="false"><span class="pad" aria-hidden="true"></span>${esc(it.name)}</button></li>`).join('')}
-              </ul>
-            </div>`).join('')}
-        </div>
-        <div class="readout" id="readout" aria-live="polite"><p class="mono readout-k">&gt; ${matchMedia('(hover: none)').matches ? 'tap' : 'click'} a tool to see how I use it</p></div>
-        </section>
+        <p class="mono jump">Jump to <a href="#sec-experience" data-jump="sec-experience">Experience</a> · <a href="#/skills">Skills (The Toolbox) →</a>${links.resume ? ` · ${link(links.resume, 'Résumé ↗')}` : ''}</p>
         <section class="hq-sec" id="sec-experience" aria-labelledby="sec-experience-h">
           <p class="marker mono"><span class="marker-line" aria-hidden="true"></span>Career Tower</p>
           <h2 class="sec-h" id="sec-experience-h">Floor by floor.</h2>
@@ -84,6 +70,24 @@ function pageHTML(pg, sub) {
             </li>`).join('')}
         </ol>
         <p class="mono resume">${links.resume ? link(links.resume, 'View the full résumé ↗') : '<span class="ph">[add your résumé PDF to show a download link]</span>'}</p>
+        </section>`;
+
+    case 'skills':
+      return `
+        ${marker(pg)}
+        <h1 id="pageTitle" tabindex="-1">The toolbox: what I reach for.</h1>
+        <p class="body">Click a tool to see how I actually use it. Each drawer of the chest outside is one of these groups.</p>
+        <section class="tool-sec" aria-label="Skills">
+          <div class="board">
+          ${skills.map((g, gi) => `
+            <div class="bus" style="--bus:${COLORS[g.color]}">
+              <p class="mono bus-name">${esc(g.group)}</p>
+              <ul>
+                ${g.items.map((it, ii) => `<li><button type="button" class="node" data-skill="${gi}-${ii}" aria-pressed="false"><span class="pad" aria-hidden="true"></span>${esc(it.name)}</button></li>`).join('')}
+              </ul>
+            </div>`).join('')}
+        </div>
+        <div class="readout" id="readout" aria-live="polite"><p class="mono readout-k">&gt; ${matchMedia('(hover: none)').matches ? 'tap' : 'click'} a tool to see how I use it</p></div>
         </section>`;
 
     case 'work':
@@ -371,6 +375,7 @@ const city = createCity($('#city'), {
   onNear: (lm) => showPrompt(lm),
   canDrive: () => !current && !dir.open && !controls.open,
   reducedMotion: () => reduced.matches,
+  toolDrawers: skills.map((g) => g.color),   // one drawer per skill group, top to bottom
 });
 if (!city) document.documentElement.classList.add('no-canvas');
 
@@ -413,6 +418,7 @@ function parse(hash) {
 function route() {
   clearTimeout(openTimer);
   const r = parse(location.hash);
+  if (city && city.lightDrawer && (!r || r.pg.id !== 'skills')) city.lightDrawer(-1);   // the drawer glows only while Skills is open
   $$('[data-nav]').forEach((n) => n.toggleAttribute('aria-current', !!r && n.dataset.nav === r.pg.id));
 
   if (!r) {
@@ -520,6 +526,7 @@ function wirePage() {
       const ro = $('#readout', body);
       ro.style.setProperty('--rc', COLORS[skills[gi].color] || COLORS.cyan);   // match the group's colour
       ro.classList.add('picked');
+      city && city.lightDrawer && city.lightDrawer(gi);
       ro.innerHTML = `<p class="mono readout-k">&gt; ${esc(it.name.toLowerCase())} ${it.level ? `<span class="readout-lvl">${ph(it.level)}</span>` : ''}</p><p class="readout-v">${ph(it.use)}</p>`;
       // if the box now covers the tool that was clicked, nudge the panel up so both are visible
       const gap = btn.getBoundingClientRect().bottom - (ro.getBoundingClientRect().top - 12);

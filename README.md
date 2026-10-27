@@ -1,6 +1,6 @@
 # waldropjoe.github.io — Waldropolis
 
-Joe Waldrop's portfolio, built as a neon city on a computer chip. Five labelled buildings hold the content: **About & Experience** (Waldrop HQ: about, skills, experience), **Work Projects**, **Passion Projects** (Ideas Lab), **Books & Podcasts** and **Contact**. Click to drive the car there, press Enter (or click the building) to go in, or open the **Directory** for a plain list. Each project has its own page at `#/work/<id>` or `#/ideas/<id>`; old `#/skills` and `#/experience` links open those sections on Waldrop HQ.
+Joe Waldrop's portfolio, built as a neon city on a computer chip. Six labelled buildings hold the content: **About & Experience** (Waldrop HQ), **Work Projects**, **Passion Projects** (Ideas Lab), **Skills** (The Toolbox — a rolling tool chest with one drawer per skill group), **Books & Podcasts** and **Contact**. Click to drive the car there, press Enter (or click the building) to go in, or open the **Directory** for a plain list. Each project has its own page at `#/work/<id>` or `#/ideas/<id>`; old `#/experience` links open that section on Waldrop HQ.
 
 No build step and no dependencies — plain HTML, CSS and JavaScript modules.
 
