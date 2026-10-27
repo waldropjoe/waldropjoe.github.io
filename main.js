@@ -1,6 +1,6 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=29';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=29';
-import * as content from './data.js?v=29';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=30';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=30';
+import * as content from './data.js?v=30';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -57,7 +57,7 @@ function pageHTML(pg, sub) {
         <section class="hq-sec" id="sec-skills" aria-labelledby="sec-skills-h">
           <p class="marker mono"><span class="marker-line" aria-hidden="true"></span>The Toolbox</p>
           <h2 class="sec-h" id="sec-skills-h">What I reach for.</h2>
-          <p class="body">Pick a tool to see how I actually use it.</p>
+          <p class="body">Click a tool to see how I actually use it.</p>
           <div class="board">
           ${skills.map((g, gi) => `
             <div class="bus" style="--bus:${COLORS[g.color]}">
@@ -67,7 +67,7 @@ function pageHTML(pg, sub) {
               </ul>
             </div>`).join('')}
         </div>
-        <div class="readout" id="readout" aria-live="polite"><p class="mono readout-k">&gt; ${matchMedia('(hover: none)').matches ? 'tap' : 'point at'} a tool to see how I use it</p></div>
+        <div class="readout" id="readout" aria-live="polite"><p class="mono readout-k">&gt; ${matchMedia('(hover: none)').matches ? 'tap' : 'click'} a tool to see how I use it</p></div>
         </section>
         <section class="hq-sec" id="sec-experience" aria-labelledby="sec-experience-h">
           <p class="marker mono"><span class="marker-line" aria-hidden="true"></span>Career Tower</p>
@@ -517,10 +517,15 @@ function wirePage() {
       const [gi, ii] = btn.dataset.skill.split('-').map(Number);
       const it = skills[gi].items[ii];
       $$('.node', body).forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-      $('#readout', body).innerHTML = `<p class="mono readout-k">&gt; ${esc(it.name.toLowerCase())} ${it.level ? `<span class="readout-lvl">${ph(it.level)}</span>` : ''}</p><p class="readout-v">${ph(it.use)}</p>`;
+      const ro = $('#readout', body);
+      ro.style.setProperty('--rc', COLORS[skills[gi].color] || COLORS.cyan);   // match the group's colour
+      ro.classList.add('picked');
+      ro.innerHTML = `<p class="mono readout-k">&gt; ${esc(it.name.toLowerCase())} ${it.level ? `<span class="readout-lvl">${ph(it.level)}</span>` : ''}</p><p class="readout-v">${ph(it.use)}</p>`;
+      // if the box now covers the tool that was clicked, nudge the panel up so both are visible
+      const gap = btn.getBoundingClientRect().bottom - (ro.getBoundingClientRect().top - 12);
+      if (gap > 0) body.scrollBy({ top: gap, behavior: reduced.matches ? 'auto' : 'smooth' });
     };
-    btn.addEventListener('click', showSkill);
-    btn.addEventListener('mouseenter', showSkill);
+    btn.addEventListener('click', showSkill);   // click (or tap) only — no hover
   });
 }
 

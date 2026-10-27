@@ -409,7 +409,8 @@ body.page-open .hero { opacity: 0; visibility: hidden; transition: opacity .3s e
   text-align: left;
 }
 .pad { width: 9px; height: 9px; border: 1px solid var(--bus); background: var(--bg); transition: background .2s, box-shadow .2s; }
-.node:hover .pad, .node[aria-pressed="true"] .pad { background: var(--bus); box-shadow: 0 0 10px var(--bus); }
+.node[aria-pressed="true"] .pad { background: var(--bus); box-shadow: 0 0 10px var(--bus); }
+.node:hover .pad { box-shadow: 0 0 6px var(--bus); }
 .node[aria-pressed="true"] { color: var(--bus); }
 .readout { margin-top: 26px; padding: 14px 16px; min-height: 92px; border: 1px solid var(--line); background: rgba(16,13,32,.7); }
 /* the readout rides along the bottom of the panel while the skills are on screen, so the
@@ -535,3 +536,8 @@ body.page-open .hero { opacity: 0; visibility: hidden; transition: opacity .3s e
   .hq-sec .readout { bottom: 8px; padding: 12px 14px; }
   .readout-v { font-size: 14px; }
 }
+
+/* readout takes the colour of the picked tool's group */
+.hq-sec .readout.picked { border-color: var(--rc); box-shadow: inset 3px 0 0 var(--rc), 0 -14px 28px 6px rgba(7, 6, 17, .92), 0 0 18px -6px var(--rc); }
+.readout.picked .readout-k { color: var(--rc); }
+.node { cursor: pointer; }
