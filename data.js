@@ -26,6 +26,14 @@ export const about = {
     'Before that I spent several years on the systems side: implementing tax technology integrated with SAP at KPMG and Ducharme, McMillen & Associates — mapping data, testing API integrations, and supporting go-lives — and running a revenue cycle application program at Parallon.',
     'Most of my work sits between the people who need something and the systems that have to deliver it. I like understanding how things work, finding where a process leaks time or clarity, and building the thing that fixes it.',
   ],
+  photo: { src: 'headshot.jpg', alt: 'Joe Waldrop, smiling, in a navy blazer' },
+  // Off the clock: shown on the About page
+  offClock: [
+    { k: 'KITCHEN', text: 'Amateur chef and home bartender.' },
+    { k: 'GOLF', text: '7-handicap golfer.' },
+    { k: 'HOCKEY', text: 'Beer-league ice hockey player.' },
+    { k: 'NEXT', text: 'Always one idea away from the next adventure.' },
+  ],
   principles: [
     { code: 'REQ → BUILD', text: 'Translate business requirements into technical work a team can deliver.' },
     { code: 'SYSTEMS', text: 'Map how data and tools connect before changing any one of them.' },
@@ -38,56 +46,9 @@ export const about = {
 };
 
 // Projects. `bucket: 'work'` (default) appears in the Work Projects building;
-// `bucket: 'ideas'` in Passion Projects (the Ideas Lab). Order here = order on the site.
+// `bucket: 'ideas'` in Passion Projects (the Ideas Lab). Order here = order on the site:
+// newest first.
 export const projects = [
-  {
-    id: 'reporting',
-    name: 'Automated Project Reporting',
-    category: 'Data analytics · Reporting automation',
-    problem: 'Project information for a revenue cycle application program lived in manual status reports, which took time to assemble and was hard for teams to get to.',
-    approach: 'Assisted with developing Power BI reporting workflows and helped teams adopt automated reporting in place of manual status updates.',
-    tools: ['Power BI'],
-    outcome: 'Reduced manual reporting effort and improved access to project information.',
-    role: 'Project Manager · HCA Healthcare, Parallon',
-    year: '2023–2025',
-    links: { caseStudy: '', demo: '', source: '' },
-  },
-  {
-    id: 'integration',
-    name: 'ERP ↔ Tax Engine Integrations',
-    category: 'API integrations · Data mapping · Testing',
-    problem: 'Enterprise clients implementing tax technology (Vertex O-Series and others) needed their ERP systems, often SAP ECC, to exchange transaction data with the tax engine correctly.',
-    approach: 'Gathered integration requirements, built data mappings, developed and tested REST API requests in Postman, ran system integration and user acceptance tests, and worked defects through with technical teams. Prepared cutover plans for go-live.',
-    tools: ['Postman', 'REST APIs', 'SAP ECC', 'Vertex O-Series', 'Python', 'Alteryx'],
-    outcome: 'Supported three Vertex O-Series go-lives across roughly 8–10 implementation engagements, then four more enterprise engagements at KPMG.',
-    role: 'Associate Consultant → Consultant (DMA) · Senior Associate (KPMG)',
-    year: '2021–2026',
-    links: { caseStudy: '', demo: '', source: '' },
-  },
-  {
-    id: 'migration',
-    name: 'Legacy Tax Data Migration',
-    category: 'Python · Data migration',
-    problem: 'Clients moving from Vertex Q-Series to O-Series had legacy data that had to be carried over.',
-    approach: 'Wrote Python scripts to help migrate the legacy Q-Series data instead of moving it by hand.',
-    tools: ['Python'],
-    outcome: 'Reduced client-billed project hours by 15%.',
-    role: 'Associate Consultant · DMA',
-    year: '2021–2023',
-    links: { caseStudy: '', demo: '', source: '' },
-  },
-  {
-    id: 'cloud-migration',
-    name: 'Payment Collection System Cloud Migration',
-    category: 'Program delivery · Cloud migration',
-    problem: 'A payment collection system was moving to the cloud while two connected systems were being upgraded — with four downstream teams, dependent applications and facility websites relying on it.',
-    approach: 'Owned the project plan and risk tracking, coordinating the vendor integration partner, the upgrading systems and every downstream team.',
-    tools: ['Project planning', 'Risk tracking', 'Vendor coordination'],
-    outcome: '',   // add one when you can support it; the row is hidden while empty
-    role: 'Project Manager · HCA Healthcare, Parallon',
-    year: '2023–2025',
-    links: { caseStudy: '', demo: '', source: '' },
-  },
   {
     id: 'issue-log',
     name: 'Webex Pilot Issue Log',
@@ -112,6 +73,48 @@ export const projects = [
     role: 'Personal project · design & build',   // bucketed with work projects by choice
     year: '2026',
     links: { caseStudy: '', demo: '', source: 'https://github.com/waldropjoe/webex-issue-log' },
+  },
+  {
+    id: 'integration',
+    name: 'ERP ↔ Tax Engine Integrations',
+    category: 'API integrations · Data mapping · Testing',
+    problem: 'Enterprise clients implementing tax technology (Vertex O-Series and others) needed their ERP systems, often SAP ECC, to exchange transaction data with the tax engine correctly.',
+    approach: 'Gathered integration requirements, built data mappings, developed and tested REST API requests in Postman, ran system integration and user acceptance tests, and worked defects through with technical teams. Prepared cutover plans for go-live.',
+    tools: ['Postman', 'REST APIs', 'SAP ECC', 'Vertex O-Series', 'Python', 'Alteryx'],
+    outcome: 'Supported three Vertex O-Series go-lives across roughly 8–10 implementation engagements, then four more enterprise engagements at KPMG.',
+    role: 'Associate Consultant → Consultant (DMA) · Senior Associate (KPMG)',
+    year: '2021–2026',
+    story: [
+      { h: 'Why it was hard', p: 'No two companies used SAP the same way. Every client’s tax needs were different, so there was no cookie-cutter integration: each one had to be mapped from that business’s own requirements and logic.' },
+      { h: 'A fix I’m proud of', p: 'A manufacturing client needed to record tax data for a special kind of transaction, and there was no field built for it. I found a field that normally carried no data and repurposed it to pass a flag, so the tax engine could recognize those transactions and record them correctly.' },
+      { h: 'What go-live day looked like', p: 'I walked the client’s SAP FI team through uploading the transports (SAP’s way of packaging changes), then validated the live tax calls in Postman to confirm the integration was returning the right results.' },
+      { h: 'What I’d do differently', p: 'Always have someone from the SAP Basis team on the go-live bridge, in case permission issues come up. Basis can fix those on the spot instead of the cutover waiting on them.' },
+    ],
+    links: { caseStudy: '', demo: '', source: '' },
+  },
+  {
+    id: 'reporting',
+    name: 'Automated Project Reporting',
+    category: 'Data analytics · Reporting automation',
+    problem: 'Project information for a revenue cycle application program lived in manual status reports, which took time to assemble and was hard for teams to get to.',
+    approach: 'Assisted with developing Power BI reporting workflows and helped teams adopt automated reporting in place of manual status updates.',
+    tools: ['Power BI'],
+    outcome: 'Reduced manual reporting effort and improved access to project information.',
+    role: 'Project Manager · HCA Healthcare, Parallon',
+    year: '2023–2025',
+    links: { caseStudy: '', demo: '', source: '' },
+  },
+  {
+    id: 'migration',
+    name: 'Legacy Tax Data Migration',
+    category: 'Python · Data migration',
+    problem: 'Clients moving from Vertex Q-Series to O-Series had legacy data that had to be carried over.',
+    approach: 'Wrote Python scripts to help migrate the legacy Q-Series data instead of moving it by hand.',
+    tools: ['Python'],
+    outcome: 'Reduced client-billed project hours by 15%.',
+    role: 'Associate Consultant · DMA',
+    year: '2021–2023',
+    links: { caseStudy: '', demo: '', source: '' },
   },
   {
     id: 'ideas',
@@ -213,9 +216,10 @@ export const experience = [
     highlights: [
       'Tracked a $1.67M operating budget and $50K capital budget; co-led monthly governance meetings with executive stakeholders.',
       'Established communication channels that cut project discovery and planning time by about two weeks.',
+      'Owned the project plan and risk tracking for a payment collection system’s move to the cloud, coordinating a vendor integration partner, two systems mid-upgrade, four downstream teams and the applications and facility websites that depended on it.',
       'Identified unused capital funds and coordinated their reallocation to server-stack upgrades.',
     ],
-    projects: ['reporting', 'cloud-migration'],
+    projects: ['reporting'],
   },
   {
     org: 'Ducharme, McMillen & Associates',

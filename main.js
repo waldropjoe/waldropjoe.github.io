@@ -1,6 +1,6 @@
-import { createCity, LANDMARKS, COLORS } from './city.js?v=26';
-import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=26';
-import * as content from './data.js?v=26';
+import { createCity, LANDMARKS, COLORS } from './city.js?v=29';
+import { person, links, about, projects, skills, experience, listening, contact } from './data.js?v=29';
+import * as content from './data.js?v=29';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -35,11 +35,19 @@ function pageHTML(pg, sub) {
     case 'about':
       return `
         ${marker(pg)}
-        <h1 id="pageTitle" tabindex="-1">${esc(about.title)}</h1>
+        <div class="about-head">
+          ${about.photo ? `<img class="headshot" src="${esc(about.photo.src)}" alt="${esc(about.photo.alt)}" width="320" height="320" decoding="async">` : ''}
+          <h1 id="pageTitle" tabindex="-1">${esc(about.title)}</h1>
+        </div>
         ${about.body.map((p) => `<p class="body">${ph(p)}</p>`).join('')}
         <ol class="principles">
           ${about.principles.map((p) => `<li><span class="mono code">${esc(p.code)}</span><span>${ph(p.text)}</span></li>`).join('')}
         </ol>
+        ${(about.offClock || []).length ? `
+        <h2 class="sub-h">Off the clock</h2>
+        <ul class="off-clock">
+          ${about.offClock.map((o) => `<li><span class="mono code">${esc(o.k)}</span><span>${ph(o.text)}</span></li>`).join('')}
+        </ul>` : ''}
         ${about.education && about.education.length ? `
         <h2 class="sub-h">Education</h2>
         <ul class="edu">
@@ -59,7 +67,7 @@ function pageHTML(pg, sub) {
               </ul>
             </div>`).join('')}
         </div>
-        <div class="readout" id="readout" aria-live="polite"><p class="mono readout-k">&gt; select a node</p></div>
+        <div class="readout" id="readout" aria-live="polite"><p class="mono readout-k">&gt; ${matchMedia('(hover: none)').matches ? 'tap' : 'point at'} a tool to see how I use it</p></div>
         </section>
         <section class="hq-sec" id="sec-experience" aria-labelledby="sec-experience-h">
           <p class="marker mono"><span class="marker-line" aria-hidden="true"></span>Career Tower</p>
