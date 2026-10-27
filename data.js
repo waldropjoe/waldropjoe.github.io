@@ -67,8 +67,8 @@ export const projects = [
       { h: 'What I’d do next', p: 'Notify the reporter in Webex when their issue is resolved, handle screenshots attached to bug reports, and swap the 15-minute polling for a Webex webhook.' },
     ],
     images: [
-      { src: 'issue-log-ado.png', alt: 'Azure DevOps bug #14, created automatically from a Webex message: the AI-written title, the original message in the description, state To Do', caption: 'A real run: a test message posted in my own Webex space became Azure DevOps bug #14, with an AI-written title and the original message attached. The message-ID tag (used to prevent duplicates) is blurred.' },
-      { src: 'issue-log-real.png', alt: 'Excel issue log with two rows: ISSUE-0001 resolved as work item 13, ISSUE-0002 new as work item 14', caption: 'The Excel log from the same runs. Bug #13 was closed in Azure DevOps, so the next run marked ISSUE-0001 Resolved on its own.' },
+      { src: 'img/issue-log-ado.png', alt: 'Azure DevOps bug #14, created automatically from a Webex message: the AI-written title, the original message in the description, state To Do', caption: 'A real run: a test message posted in my own Webex space became Azure DevOps bug #14, with an AI-written title and the original message attached. The message-ID tag (used to prevent duplicates) is blurred.' },
+      { src: 'img/issue-log-real.png', alt: 'Excel issue log with two rows: ISSUE-0001 resolved as work item 13, ISSUE-0002 new as work item 14', caption: 'The Excel log from the same runs. Bug #13 was closed in Azure DevOps, so the next run marked ISSUE-0001 Resolved on its own.' },
     ],
     role: 'Personal project · design & build',   // bucketed with work projects by choice
     year: '2026',
