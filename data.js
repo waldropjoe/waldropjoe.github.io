@@ -93,18 +93,6 @@ export const projects = [
     links: { caseStudy: '', demo: '', source: '' },
   },
   {
-    id: 'reporting',
-    name: 'Automated Project Reporting',
-    category: 'Data analytics · Reporting automation',
-    problem: 'Project information for a revenue cycle application program lived in manual status reports, which took time to assemble and was hard for teams to get to.',
-    approach: 'Assisted with developing Power BI reporting workflows and helped teams adopt automated reporting in place of manual status updates.',
-    tools: ['Power BI'],
-    outcome: 'Reduced manual reporting effort and improved access to project information.',
-    role: 'Project Manager · HCA Healthcare, Parallon',
-    year: '2023–2025',
-    links: { caseStudy: '', demo: '', source: '' },
-  },
-  {
     id: 'migration',
     name: 'Legacy Tax Data Migration',
     category: 'Python · Data migration',
@@ -161,7 +149,7 @@ export const skills = [
     items: [
       { name: 'Python', level: 'working knowledge', use: 'Workflows for processing and validating ERP transaction data; legacy data migration scripts.' },
       { name: 'Alteryx', use: 'Workflows for processing and validating ERP transaction data and other business data.' },
-      { name: 'Power BI', use: 'Reporting workflows that replaced manual project reporting.' },
+      { name: 'Power BI', use: 'Reports and dashboards for project and business data.' },
       { name: 'Tableau', use: 'Data visualization and dashboards.' },
       { name: 'SQL', level: 'working knowledge', use: 'Querying data for analysis.' },
     ],
@@ -219,7 +207,6 @@ export const experience = [
       'Owned the project plan and risk tracking for a payment collection system’s move to the cloud, coordinating a vendor integration partner, two systems mid-upgrade, four downstream teams and the applications and facility websites that depended on it.',
       'Identified unused capital funds and coordinated their reallocation to server-stack upgrades.',
     ],
-    projects: ['reporting'],
   },
   {
     org: 'Ducharme, McMillen & Associates',
