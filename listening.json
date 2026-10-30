@@ -130,5 +130,16 @@
     "link": "https://open.spotify.com/episode/0eKeey3CHXUKGSxF9xucWC",
     "cover": "https://i.scdn.co/image/ab67656300005f1f0101546a15f4ab3ca4b46eaf",
     "source": "spotify"
+  },
+  {
+    "id": "spotify:episode:1qCBIvlcvmPaMf8cuH0LJt",
+    "type": "podcast",
+    "status": "done",
+    "title": "Palmer Luckey",
+    "by": "Tetragrammaton with Rick Rubin",
+    "date": "2026-10",
+    "link": "https://open.spotify.com/episode/1qCBIvlcvmPaMf8cuH0LJt",
+    "cover": "https://i.scdn.co/image/ab67656300005f1fc3c1f7372de996aa09ea1a46",
+    "source": "spotify"
   }
 ]
